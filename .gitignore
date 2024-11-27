@@ -1,2 +1,61 @@
 **/__pycache__/
 
+# Python
+*.pyc
+*.pyo
+__pycache__/
+*.pyd
+*.db
+*.sqlite3
+
+# Virtual environment
+venv/
+env/
+ENV/
+*.env
+.venv/
+.venv.*
+
+# Flask config files
+instance/
+*.log
+
+# Python wheel packages
+*.whl
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# VS Code settings
+.vscode/
+
+# PyCharm settings
+.idea/
+
+# PostgreSQL
+*.sql
+*.postgresql
+*.pgdata
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# JetBrains IDE
+.idea/
+
+# Coverage report directories
+.coverage
+*.coveragerc
+
+# pytest
+.cache/
+
+# Flask migrations (if using Flask-Migrate)
+migrations/
+
+# Secrets
+*.env
+*.secret
