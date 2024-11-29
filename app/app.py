@@ -8,7 +8,7 @@ def start_app():
     app = Flask(__name__)
     try:
 
-        init_db()
+        # init_db()
         setup_logger()
 
         # register_error_handlers(app)
