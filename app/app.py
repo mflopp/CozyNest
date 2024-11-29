@@ -2,6 +2,7 @@ from flask import Flask
 import logging
 from config import init_db, setup_logger, load_config
 
+
 # -- start app function
 def start_app():
     app = Flask(__name__)
