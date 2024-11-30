@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, Date, ForeignKey, Enum, TIMESTAMP
+from sqlalchemy import CheckConstraint, create_engine, Column, Integer, String, Date, ForeignKey, Enum, TIMESTAMP
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from ..properties.Items_model import Items
