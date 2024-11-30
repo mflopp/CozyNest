@@ -1,5 +1,5 @@
 from sqlalchemy import DECIMAL, Column, Integer, String, Date, ForeignKey
-from models import Base
+from config import Base
 from sqlalchemy.orm import relationship
 
 # -- Validation MUST be added
@@ -12,7 +12,7 @@ class Orders(Base):
     item_id = Column(Integer, ForeignKey('items.id'), nullable=False)
     guest_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     # -- payment_id ?????
-    total_price = Column(DECIMAL(10, 2), nullable=False) # Ensures the total_price has two decimal points
+    total_price = Column(DECIMAL(10, 2), nullable=False)
     date_checkin = Column(Date, nullable=False)
     date_checkout = Column(Date, nullable=False)
     people_amount = Column(Integer, default=1)
@@ -25,4 +25,3 @@ class Orders(Base):
         from ..users.Users_model import Users  # Local import within the class
         self.item = kwargs.get('item')
         self.user = kwargs.get('user')
-
