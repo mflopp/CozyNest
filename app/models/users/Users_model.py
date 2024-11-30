@@ -52,6 +52,7 @@ class Users(Base):
     phone = Column(String, unique=True, nullable=False)
     created_at = Column(TIMESTAMP, server_default=func.now())
     updated_at = Column(TIMESTAMP, onupdate=func.now())
+    # deleted = Column(Boolean, default=False)
     role = relationship("UserRoles")
     info = relationship("UserInfos")
 

@@ -1,1 +1,1 @@
-from controllers.user_controllers.user_controller import get_all_users, get_user, create_user
+from controllers.user_controllers.user_controller import get_all_users, get_user, create_user, update_user, delete_user
