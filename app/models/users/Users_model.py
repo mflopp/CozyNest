@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Date, ForeignKey, Enum, TIMESTAMP
 from sqlalchemy.orm import relationship
-from models import Base
+from config import Base
 from sqlalchemy.sql import func
 
 # -- Validation MUST be added
@@ -9,6 +9,7 @@ from sqlalchemy.sql import func
 currency_type = Enum('USD', 'EUR', 'ILS/NIS', 'RUB', name='currency_type')
 language_type = Enum('ENG', 'RU', 'HEB', name='language_type')
 
+
 # Define Models
 class UserRoles(Base):
     __tablename__ = 'userroles'
@@ -16,17 +17,20 @@ class UserRoles(Base):
     role = Column(String, unique=True, nullable=False)
     description = Column(String)
 
+
 class Genders(Base):
     __tablename__ = 'genders'
     id = Column(Integer, primary_key=True)
     gender = Column(String, unique=True, nullable=False)
     description = Column(String)
 
+
 class UserSettings(Base):
     __tablename__ = 'usersettings'
     id = Column(Integer, primary_key=True)
     currency = Column(currency_type, default='USD')
     language = Column(language_type, default='ENG')
+
 
 class UserInfos(Base):
     __tablename__ = 'userinfos'
@@ -41,6 +45,7 @@ class UserInfos(Base):
     gender = relationship("Genders")
     settings = relationship("UserSettings")
 
+
 class Users(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
@@ -54,4 +59,3 @@ class Users(Base):
     updated_at = Column(TIMESTAMP, onupdate=func.now())
     role = relationship("UserRoles")
     info = relationship("UserInfos")
-
