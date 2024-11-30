@@ -6,3 +6,8 @@ from models.properties.Locations_model import Cities, Countries, Regions
 from models.properties.SleepingPlaces_model import SleepingPlaces, SleepingPlacesPerItem
 from models.orders.Orders_model import Orders
 from models.reviews.Reviews_model import Reviews
+
+# User related Models
+from users import *
+
+# Description
