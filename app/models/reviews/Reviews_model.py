@@ -1,6 +1,7 @@
-from sqlalchemy import CheckConstraint, Column, Integer, String, Date, ForeignKey, Enum, TIMESTAMP
+from sqlalchemy import CheckConstraint, Column, Integer, String, ForeignKey, TIMESTAMP
 from models import Base
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
 # -- Validation MUST be added
 
@@ -13,7 +14,7 @@ class Reviews(Base):
     guest_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     rating = Column(Integer, CheckConstraint('rating >= 1 AND rating <= 5'), nullable=False) # Ensuring rating is between 1 and 5
     comment = Column(String)
-    created_at = Column(TIMESTAMP, default='CURRENT_TIMESTAMP')
+    created_at = Column(TIMESTAMP, server_default=func.now())
     item = relationship("Items")
     user = relationship("Users")
 

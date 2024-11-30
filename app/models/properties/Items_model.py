@@ -1,6 +1,7 @@
 from sqlalchemy import DECIMAL, Float, Column, Integer, String, Date, ForeignKey, Enum, TIMESTAMP
 from models import Base
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
 # -- Validation MUST be added
 
@@ -46,8 +47,8 @@ class Items(Base):
     max_capacity = Column(Integer, default=1)
     price = Column(DECIMAL(10, 2), nullable=False) # Ensures the price has two decimal points
     status = Column(String, default="active")
-    created_at = Column(TIMESTAMP, default='CURRENT_TIMESTAMP')
-    updated_at = Column(TIMESTAMP, default='CURRENT_TIMESTAMP')
+    created_at = Column(TIMESTAMP, server_default=func.now())
+    updated_at = Column(TIMESTAMP, onupdate=func.now())
     housingtype = relationship("HousingTypes")
     user = relationship("Users")
     address = relationship("ItemAddress")

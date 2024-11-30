@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Date, ForeignKey, Enum, TIMESTAMP
 from sqlalchemy.orm import relationship
 from models import Base
+from sqlalchemy.sql import func
 
 # -- Validation MUST be added
 
@@ -35,8 +36,8 @@ class UserInfos(Base):
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     birthdate = Column(Date)
-    created_at = Column(TIMESTAMP, default='CURRENT_TIMESTAMP')
-    updated_at = Column(TIMESTAMP, default='CURRENT_TIMESTAMP')
+    created_at = Column(TIMESTAMP, server_default=func.now())
+    updated_at = Column(TIMESTAMP, onupdate=func.now())
     gender = relationship("Genders")
     settings = relationship("UserSettings")
 
@@ -49,8 +50,8 @@ class Users(Base):
     password = Column(String, nullable=False)
     # age = Column(Integer, nullable=False)
     phone = Column(String, unique=True, nullable=False)
-    created_at = Column(TIMESTAMP, default='CURRENT_TIMESTAMP')
-    updated_at = Column(TIMESTAMP, default='CURRENT_TIMESTAMP')
+    created_at = Column(TIMESTAMP, server_default=func.now())
+    updated_at = Column(TIMESTAMP, onupdate=func.now())
     role = relationship("UserRoles")
     info = relationship("UserInfos")
 
