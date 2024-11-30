@@ -1,1 +1,1 @@
-from user_test_data import add_test_users
+from .user_test_data import add_test_users
