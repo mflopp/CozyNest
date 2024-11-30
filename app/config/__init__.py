@@ -1,4 +1,4 @@
-from .db import init_db, get_db_conn
+from .db import init_db, get_db
 import logging
 import os
 from dotenv import load_dotenv

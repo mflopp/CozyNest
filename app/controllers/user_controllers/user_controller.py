@@ -1,19 +1,17 @@
+from sqlalchemy.orm import Session
 import logging
-# import os
 from flask import abort, request
-from config import get_db_conn 
+# from config import get_db_conn
+from models import Users, UserInfos, UserRoles, Genders, UserSettings
 
 
 # logger = setup_logger()
 
 # get all users
-def get_all_users():
+def get_all_users(db: Session):
     try:
-        conn = get_db_conn()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM users")
-        users = cursor.fetchall()
-        conn.close()
+        # Use SQLAlchemy to query all users
+        users = db.query(Users).all()
         logging.info(f"{len(users)} users found in the DB")
         return users
     except Exception as e:
@@ -22,16 +20,15 @@ def get_all_users():
 
 # -- Not Ready, just template --
 # get user
-def get_user(id):
-    try:    
-        conn = get_db_conn()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM users WHERE id = ?", (id,))
-        found_user = cursor.fetchone()
-        conn.close()
-        endpoint = request.endpoint
-        logging.info(f"{endpoint}: {found_user}")
-        return found_user
+def get_user(id: int, db: Session):
+    try:
+        user = db.query(Users).filter(Users.id == id).first()
+        if user:
+            endpoint = request.endpoint
+            logging.info(f"{endpoint}: {user}")
+            return user
+        else:
+            abort(404, "User not found")
     except Exception as e:
         logging.error(str(e))
         abort(500)
@@ -39,24 +36,17 @@ def get_user(id):
 
 # -- Not Ready, just template --
 # create user
-def create_user(user):
+def create_user(user_data, db: Session):
     """
     - receive a user as a tuple of (username, password, email, age)
     """
     try:
-        conn = get_db_conn()
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO users (username, password, email, age)
-            VALUES (?, ?, ?, ?)
-        """, user
-        )
-        conn.commit()
-        
-        user_id = cursor.lastrowid
-        logging.info(f"Created a user with a user_id of: {user_id}")
-        conn.close()
-        return {"message": "Created user", "id": user_id}
+        new_user = Users(**user_data)
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+        logging.info(f"Created a user with a user_id of: {new_user.id}")
+        return {"message": "Created user", "id": new_user.id}
     except Exception as e:
         logging.error(str(e))
         abort(500)

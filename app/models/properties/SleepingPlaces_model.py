@@ -1,15 +1,6 @@
-from sqlalchemy import CheckConstraint, create_engine, Column, Integer, String, Date, ForeignKey, Enum, TIMESTAMP
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
-from Items_model import Items
-
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-DATABASE_URL = os.getenv("DATABASE_URL", "*")
-
-Base = declarative_base()
+from sqlalchemy import CheckConstraint, Column, Integer, String, Date, ForeignKey, Enum, TIMESTAMP
+from models import Base
+from sqlalchemy.orm import relationship
 
 # -- Validation MUST be added
 
@@ -32,19 +23,6 @@ class SleepingPlacesPerItem(Base):
     place = relationship("SleepingPlaces")
     item = relationship("Items")
 
-# Initialize the database
-engine = create_engine(DATABASE_URL)
-Base.metadata.create_all(engine)
-
-# Create a new session
-Session = sessionmaker(bind=engine)
-session = Session()
-
-# Your database operations here 
-
-# Commit the session (if there are transactions to commit)
-session.commit() 
-# Close the session 
-session.close()
-
-print("Connected and created tables")
+    def __init__(self, **kwargs):
+        from .Items_model import Items  # Local import within the class
+        self.item = kwargs.get('item')

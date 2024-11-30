@@ -1,16 +1,6 @@
-from sqlalchemy import DECIMAL, Float, create_engine, Column, Integer, String, Date, ForeignKey, Enum, TIMESTAMP
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
-from Locations_model import Cities
-from ..users.Users_model import Users
-
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-DATABASE_URL = os.getenv("DATABASE_URL", "*")
-
-Base = declarative_base()
+from sqlalchemy import DECIMAL, Float, Column, Integer, String, Date, ForeignKey, Enum, TIMESTAMP
+from models import Base
+from sqlalchemy.orm import relationship
 
 # -- Validation MUST be added
 
@@ -41,6 +31,10 @@ class ItemAddress(Base):
     longitude = Column(Float, nullable=False)
     city = relationship("Cities")
     
+    def __init__(self, **kwargs):
+        from .Locations_model import Cities  # Local import within the class
+        self.city = kwargs.get('city')
+    
 class Items(Base):
     __tablename__ = 'items'
     id = Column(Integer, primary_key=True)
@@ -58,6 +52,10 @@ class Items(Base):
     user = relationship("Users")
     address = relationship("ItemAddress")
 
+    def __init__(self, **kwargs):
+        from models.users.Users_model import Users  # Local import within the class
+        self.user = kwargs.get('user')
+        
 class RulesPerItem(Base):
     __tablename__ = 'rulesperitem'
     id = Column(Integer, primary_key=True)
@@ -83,19 +81,3 @@ class ItemsImage(Base):
     src = Column(String, nullable=False)
     item = relationship("Items")
 
-# Initialize the database
-engine = create_engine(DATABASE_URL)
-Base.metadata.create_all(engine)
-
-# Create a new session
-Session = sessionmaker(bind=engine)
-session = Session()
-
-# Your database operations here 
-
-# Commit the session (if there are transactions to commit)
-session.commit() 
-# Close the session 
-session.close()
-
-print("Connected and created tables")

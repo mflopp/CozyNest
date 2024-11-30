@@ -1,6 +1,7 @@
 from flask import Blueprint, request
+from config import get_db
 from controllers import get_all_users, get_user, create_user
-
+from sqlalchemy.orm import Session
 # from controllers.authentication import login_user, register_user
 import logging
 
@@ -12,10 +13,10 @@ users_bp = Blueprint('users', __name__, url_prefix="/users")
 @users_bp.route("", methods=['GET'])
 def get_users_bp():
     try:
-        logging.debug("First")
-        users = get_all_users()
+        db = next(get_db())  # Call get_db() to get a session
+        users = get_all_users(db)
         if users:
-            return users, 200
+            return {"users": users}, 200
         return "Users not found", 404
     except Exception as e:
         logging.error(str(e))
@@ -29,10 +30,9 @@ def create_user_bp():
         data = request.get_json()
         if not data:
             return "User data not found", 400
-        # user = register_user(data)
-        user = None
-        
-        return user
+        db = next(get_db())  # Call get_db() to get a session
+        user = create_user(data, db)
+        return user, 201
     except Exception as e:
         logging.error(str(e))
         return "Error finding user", 500      
@@ -41,10 +41,10 @@ def create_user_bp():
 @users_bp.route("<int:id>", methods=['GET'])
 def get_user_bp(id):
     try:
-        user = get_user(id)
+        db = next(get_db())  # Call get_db() to get a session
+        user = get_user(id, db)
         if user:
-            list_user = list(user) 
-            return (list_user, 200)
+            return user, 200
         return "User not found", 404
     except Exception as e:
         logging.error(str(e))

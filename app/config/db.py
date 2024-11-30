@@ -1,12 +1,59 @@
-import psycopg2
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 import os
 from dotenv import load_dotenv
+from models import Base  # Import the shared Base from your base.py
+# import psycopg2
+# Import all models to ensure they are registered with Base
+from models import Users, UserInfos, UserRoles, Genders, UserSettings
+from models import HousingTypes, Rules, ItemAddress, Items, RulesPerItem, ItemAvailability, ItemsImage
+from models import AmenitiesCategories, Amenities, AmenitiesPerItem
+from models import Cities, Countries, Regions
+from models import SleepingPlaces, SleepingPlacesPerItem
+from models import Orders
+from models import Reviews
 
-global DATABASE_URL
+
+load_dotenv()
+DATABASE_URL = os.getenv("DATABASE_URL", "*")
+
+# Initialize the database engine
+engine = create_engine(DATABASE_URL)
+
+# Create a configured "Session" class
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 def init_db():
-    global DATABASE_URL
-    load_dotenv()
-    DATABASE_URL = os.getenv("DATABASE_URL", "*")
+    """
+    Initialize the database by creating all tables.
+    """
+    Base.metadata.create_all(bind=engine)
+    print("Connected and created tables")
+
+def get_db():
+    """
+    Dependency to get a SQLAlchemy session.
+    """
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+# -- Older version:
+
+# global DATABASE_URL
+# def init_db():
+#     global DATABASE_URL
+#     load_dotenv()
+#     DATABASE_URL = os.getenv("DATABASE_URL", "*")
+
+#     # Initialize the database
+#     engine = create_engine(DATABASE_URL)
+#     Base.metadata.create_all(engine)  # Create all tables
+
+
     # connection = psycopg2.connect(DATABASE_URL, sslmode='require')
         
 
@@ -79,8 +126,8 @@ def init_db():
 #  """)
   
 #         conn.commit()
-    print("Connected and created tables")
+#     print("Connected and created tables")
     
 
-def get_db_conn():
-    return  psycopg2.connect(DATABASE_URL, sslmode='require')
+# def get_db_conn():
+#     return  psycopg2.connect(DATABASE_URL, sslmode='require')
