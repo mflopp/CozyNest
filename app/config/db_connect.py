@@ -1,25 +1,57 @@
-import psycopg2
-from db_config import host, user, password, db_name
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, Session
+from flask_sqlalchemy import SQLAlchemy
+from flask import Flask
+from .db_config import DB_URI
+from .base_config import Base
 
-try:
-    # connect to exist db
-    connection = psycopg2.connect(
-        host=host,
-        user=user,
-        password=password,
-        database=db_name,
-        sslmode='require'
-    )
+# Create SQLAlchemy object for working with the database
+db = SQLAlchemy()
 
-    # cursor for performing db operations
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT version();")
-        db_version = cursor.fetchone()
-        print("[RESULT] DB version:", db_version)
+# Create the engine for connecting to PostgreSQL using SQLAlchemy
+engine = create_engine(DB_URI, echo=True)
 
-except Exception as _ex:
-    print("[INFO] Error while working with PostgreSQL", _ex)
-finally:
-    if connection:
-        connection.close()
-        print("[INFO] PostgreSQL connection closed")
+# Create a session maker bound to the engine
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+def init_db(app: Flask) -> None:
+    """
+    Initialize the database for a Flask application by configuring
+    the database URI and setting up the SQLAlchemy object.
+
+    Args:
+        app (Flask): The Flask application instance.
+    """
+    app.config['SQLALCHEMY_DATABASE_URI'] = DB_URI
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    db.init_app(app)
+
+
+def get_session() -> Session:    # type: ignore
+    """
+    Dependency for getting the current SQLAlchemy session.
+    Creates a new session for interacting with the database,
+    which is closed after use.
+
+    Returns:
+        Session: The SQLAlchemy session object.
+    """
+    session = SessionLocal()
+    try:
+        yield session
+    finally:
+        session.close()
+
+
+def init_tables() -> None:
+    """
+    Initialize the database by creating all tables defined in the models.
+    This function will create the tables if they don't exist already.
+    It will print a message confirming the success or failure of the operation.
+    """
+    try:
+        Base.metadata.create_all(bind=engine)
+        print("Connected and tables created.")
+    except Exception as e:
+        print(f"Error creating tables: {e}")
