@@ -1,22 +1,24 @@
 from flask import Flask
 import logging
-from config import init_db, setup_logger, load_config
+from config import init_db, config_data
 from routes import register_all_blueprints
+from utils.logger import setup_logger
+
 
 # -- start app function
 def start_app():
     app = Flask(__name__)
-    try:
 
-        init_db()
+    try:
+        init_db(app)
         setup_logger()
 
         # register_error_handlers(app)
 
-        app.config.update(load_config())
+        app.config.update(config_data)
 
         register_all_blueprints(app)
-        
+
     except Exception as e:
         logging.critical(f"Failed at initialization: {str(e)}")
 
