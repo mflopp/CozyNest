@@ -43,8 +43,8 @@ def get_connection_uri(config_data):
     user = config_data['DB_USER']
     password = config_data['DB_PASSWORD']
     db_name = config_data['DB_NAME']
-    port = config_data['PORT']
-    host = config_data['HOST']
+    port = config_data['DB_PORT']
+    host = config_data['DB_HOST']
 
     result_url = f'postgresql://{user}:{password}@{host}:{port}/{db_name}'
 
@@ -58,7 +58,9 @@ default_values = {
     "DB_NAME": "default_db",
     "DB_PASSWORD": "default_password",
     "DB_USER": "default_user",
-    "CLIENT_URL": "*"
+    "CLIENT_URL": "*",
+    "DB_PORT": 5432,
+    "DB_HOST": "0.0.0.0"
 }
 
 # Load configuration

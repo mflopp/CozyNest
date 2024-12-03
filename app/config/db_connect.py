@@ -4,6 +4,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 from .db_config import DB_URI
 from .base_config import Base
+from .sp_base import SPBase
+
+from typing import Generator
 
 # Create SQLAlchemy object for working with the database
 db = SQLAlchemy()
@@ -28,7 +31,7 @@ def init_db(app: Flask) -> None:
     db.init_app(app)
 
 
-def get_session() -> Session:    # type: ignore
+def get_session() -> Generator[Session, None, None]:
     """
     Dependency for getting the current SQLAlchemy session.
     Creates a new session for interacting with the database,
@@ -51,7 +54,7 @@ def init_tables() -> None:
     It will print a message confirming the success or failure of the operation.
     """
     try:
-        Base.metadata.create_all(bind=engine)
+        SPBase.metadata.create_all(bind=engine)
         print("Connected and tables created.")
     except Exception as e:
         print(f"Error creating tables: {e}")
