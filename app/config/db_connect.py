@@ -4,7 +4,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 from .db_config import DB_URI
 from .base_config import Base
-from .sp_base import SPBase
 
 from typing import Generator
 
@@ -54,7 +53,7 @@ def init_tables() -> None:
     It will print a message confirming the success or failure of the operation.
     """
     try:
-        SPBase.metadata.create_all(bind=engine)
+        Base.metadata.create_all(bind=engine)
         print("Connected and tables created.")
     except Exception as e:
         print(f"Error creating tables: {e}")
