@@ -1,8 +1,11 @@
 from flask import Flask
 import logging
-from config import init_db, config_data
+
+from config import init_db, config_data, init_tables
 from routes import register_all_blueprints
 from utils.logger import setup_logger
+
+from services import try_to_test
 
 
 # -- start app function
@@ -14,8 +17,9 @@ def start_app():
         setup_logger()
 
         # register_error_handlers(app)
-
         app.config.update(config_data)
+        # init_tables()
+        try_to_test()
 
         register_all_blueprints(app)
 
