@@ -4,6 +4,11 @@ from .reviews import *
 from .orders import *
 from .users import *
 
+<<<<<<< HEAD
+=======
+# User related Models
+# from users import *
+>>>>>>> d2e6acee4d4e772b85cc51283fca91c5edc7e607
 
 __all__ = [
     *accommodations.__all__,
