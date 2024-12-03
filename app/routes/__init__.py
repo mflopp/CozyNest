@@ -1,9 +1,7 @@
-from routes.users_bp import users_bp
+from .user_routes import *
+from .register_blueprint import register_all_blueprints
 
-def register_all_blueprints(app):
-    # Register blueprints (routes)
-    app.register_blueprint(users_bp)
-    
-    # for rule in app.url_map.iter_rules():
-    #     print(f"Route: {rule} --> Endpoint: {rule.endpoint}, Methods: {rule.methods}")
-    
+__all__ = [
+    *user_routes.__all__,
+    'register_all_blueprints',
+]
