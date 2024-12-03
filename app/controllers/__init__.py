@@ -1,1 +1,5 @@
-from controllers.user_controllers.user_controller import get_all_users, get_user, create_user, update_user, delete_user
+from .user_controllers import *
+
+__all__ = [
+    *user_controllers.__all__,
+]
