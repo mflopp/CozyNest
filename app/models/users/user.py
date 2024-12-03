@@ -21,8 +21,8 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
-    role_id = Column(Integer, ForeignKey('userroles.id'), nullable=False)
-    info_id = Column(Integer, ForeignKey('userinfos.id'), nullable=False)
+    role_id = Column(Integer, ForeignKey('user_roles.id'), nullable=False)
+    info_id = Column(Integer, ForeignKey('user_infos.id'), nullable=False)
 
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
@@ -31,8 +31,8 @@ class User(Base):
     created_at = Column(TIMESTAMP, server_default=func.now())
     updated_at = Column(TIMESTAMP, onupdate=func.now())
 
-    role = relationship("UserRoles")
-    info = relationship("UserInfos")
+    role = relationship("UserRole")
+    info = relationship("UserInfo")
 
     def __repr__(self):
         return (
