@@ -1,13 +1,28 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 import logging
 from flask import abort
 
 from models.users import User, UserInfo, UserRole, Gender, UserSettings
 
 
-def fetch_user(id: int, db: Session):
+def fetch_user(id: int, db: Session) -> dict:
+    """
+    Fetches user data from the database by ID, including related information.
+
+    Args:
+        id (int): User ID.
+        db (Session): SQLAlchemy database session.
+
+    Returns:
+        dict: User data including personal details, role, and settings.
+
+    Raises:
+        404: If user is not found.
+        500: For other server errors.
+    """
     try:
-        # Use SQLAlchemy to query the user by ID and their related information
+        # Query user and related data
         user = db.query(
             User.id.label("user_id"),
             User.email,
@@ -18,8 +33,8 @@ def fetch_user(id: int, db: Session):
             Gender.gender,
             User.phone,
             UserRole.role.label("user_role"),
-            UserInfo,
-            UserSettings,
+            UserSettings.currency.label("currency"),
+            UserSettings.language.label("language"),
             User.created_at,
             User.updated_at
         ).join(UserInfo, User.info_id == UserInfo.id)\
@@ -36,7 +51,7 @@ def fetch_user(id: int, db: Session):
         user_data = {
             "user_id": user.user_id,
             "email": user.email,
-            "password": user.password,
+            "password": user.password,  # Consider excluding sensitive data
             "first_name": user.first_name,
             "last_name": user.last_name,
             "birthdate": user.birthdate.strftime("%d.%m.%Y"),
@@ -44,15 +59,19 @@ def fetch_user(id: int, db: Session):
             "phone": user.phone,
             "role": user.user_role,
             "user_settings": {
-                "currency": user.UserInfo.settings.currency,
-                "language": user.UserInfo.settings.language
+                "currency": user.currency,
+                "language": user.language
             },
             "created_at": user.created_at,
             "updated_at": user.updated_at
         }
 
         logging.info(f"User found with ID {id}")
+
         return user_data
+    except SQLAlchemyError as e:
+        logging.error(f"Database error: {e}")
+        abort(500, description="Database error")
     except Exception as e:
-        logging.error(str(e))
-        abort(500)
+        logging.error(f"Unexpected error: {e}")
+        abort(500, description="An unexpected error occurred")
