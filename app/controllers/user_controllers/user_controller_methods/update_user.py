@@ -2,16 +2,7 @@ from sqlalchemy.orm import Session
 import logging
 
 from models.users import User, UserInfo, UserRole, Gender, UserSettings
-
-
-def get_first_record_by_criteria(
-    session: Session,
-    Model: type,
-    filter_criteria: dict
-) -> object | None:
-    """Retrieve the first record from the database that matches
-    the given criteria."""
-    return session.query(Model).filter_by(**filter_criteria).first()
+from controller_utils import get_first_record_by_criteria
 
 
 def update_user_data(id: int, user_data: dict, session: Session):

@@ -4,6 +4,7 @@ import logging
 from flask import abort
 
 from models.users import User, UserInfo, UserRole, Gender, UserSettings
+from controller_utils import get_first_record_by_criteria
 
 
 def fetch_user(id: int, db: Session) -> dict:

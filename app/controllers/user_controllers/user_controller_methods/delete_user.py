@@ -4,15 +4,7 @@ import logging
 from models.users import User, UserInfo
 from models.orders import Order
 
-
-def get_first_record_by_criteria(
-    session: Session,
-    Model: type,
-    filter_criteria: dict
-) -> object | None:
-    """Retrieve the first record from the database that matches
-    the given criteria."""
-    return session.query(Model).filter_by(**filter_criteria).first()
+from controller_utils import get_first_record_by_criteria
 
 
 def del_user(id: int, session: Session):
