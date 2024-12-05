@@ -5,7 +5,7 @@ import logging
 
 def get_first_record_by_criteria(
     session: Session,
-    Model: Type,
+    Model: Type[Any],
     filter_criteria: dict[str, Any]
 ) -> Optional[object]:
     """

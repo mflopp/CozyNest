@@ -3,7 +3,6 @@ import logging
 from flask import abort
 
 from models.users import User, UserInfo, UserRole, Gender, UserSettings
-from controller_utils import get_first_record_by_criteria
 
 def fetch_users(db: Session):
     try:
@@ -36,7 +35,7 @@ def fetch_users(db: Session):
                 "password": user.password,
                 "first_name": user.first_name,
                 "last_name": user.last_name,
-                "birthdate": user.birthdate.strftime("%d.%m.%Y"),
+                "birthdate": user.birthdate.strftime("%d.%m.%Y") if user.birthdate else None,
                 "gender": user.gender,
                 "phone": user.phone,
                 "role": user.user_role,

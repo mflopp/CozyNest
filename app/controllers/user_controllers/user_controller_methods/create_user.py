@@ -4,7 +4,7 @@ from sqlalchemy.sql import func
 
 from models.users import User, UserInfo, UserRole, Gender, UserSettings
 
-from controller_utils import get_first_record_by_criteria
+from controllers.controller_utils import get_first_record_by_criteria
 
 
 def add_user(user_data: dict, session: Session):
@@ -13,9 +13,7 @@ def add_user(user_data: dict, session: Session):
     try:
         # Validate required fields
         required_fields = [
-            'email', 'password',
-            'first_name', 'last_name',
-            'gender', 'phone'
+            'email', 'password', 'phone'
         ]
 
         for field in required_fields:
@@ -39,16 +37,26 @@ def add_user(user_data: dict, session: Session):
 
         if errors:
             return {"error": "Validation failed", "details": errors}, 400
+        
+        gender_pre = "Male"
 
         # Find or create gender before any commits
         gender = get_first_record_by_criteria(
-            session, Gender, {"gender": user_data["gender"]}
+            session, Gender, {"gender": user_data[gender_pre]}
         )
 
-        if not gender:
-            errors.append(f"Gender {user_data['gender']} not found")
-            return {"error": "Validation failed", "details": errors}, 400
-
+        # # Parse the birthdate
+        # birthdate = user_data.get('birthdate')
+        # if birthdate:
+        #     try:
+        #         birthdate = datetime.strptime(birthdate, "%d.%m.%Y").date()
+        #     except ValueError:
+        #         errors.append("Invalid birthdate format. Use DD.MM.YYYY")
+        #         return {"error": "Validation failed", "details": errors}, 400
+            
+        # Start a new transaction
+        session.begin_nested()
+        
         # Default UserSettings
         default_currency = 'USD'
         default_language = 'ENG'
@@ -68,47 +76,31 @@ def add_user(user_data: dict, session: Session):
 
         # Create UserInfo
         user_info = UserInfo(
-            gender_id=gender.id,
-            user_settings_id=user_settings.id,
-            first_name=user_data['first_name'],
-            last_name=user_data['last_name'],
-            birthdate=user_data.get('birthdate'),
+            gender_id=gender.id, # may cause trouble
+            user_settings_id=1, # may cause trouble
+            first_name='first_name',
+            last_name='last_name',
+            birthdate = None,
             created_at=func.now(),
             updated_at=func.now()
         )
+        # user_info = UserInfo(
+        #     gender_id=gender.id,
+        #     user_settings_id=user_settings.id,
+        #     first_name=user_data['first_name'],
+        #     last_name=user_data['last_name'],
+        #     birthdate=user_data.get('birthdate'),
+        #     created_at=func.now(),
+        #     updated_at=func.now()
+        # )
         session.add(user_info)
         session.commit()
 
-        # Determine user role
-        if 'role' in user_data and user_data['role'] == 'Owner':
-            user_role = get_first_record_by_criteria(
-                session,
-                UserRole,
-                {"role": 'Owner'}
-            )
-            # -- this part may be unnecessary
-            if not user_role:
-                user_role = UserRole(
-                    role='Owner',
-                    description='Owner of the property role'
-                )
-                session.add(user_role)
-                session.commit()
-        else:
-            user_role = get_first_record_by_criteria(
-                session,
-                UserRole,
-                {"role": 'User'}
-            )
-
-            # -- this part may be unnecessary
-            if not user_role:
-                user_role = UserRole(
-                    role='User',
-                    description='Regular user role'
-                )
-                session.add(user_role)
-                session.commit()
+        user_role = get_first_record_by_criteria(
+                        session,
+                        UserRole,
+                        {"role": 'User'}
+                    )
 
         # Create the user
         user = User(
@@ -124,7 +116,7 @@ def add_user(user_data: dict, session: Session):
         session.commit()
 
         logging.info(f"User created successfully with ID {user.id}")
-        return {"message": "User created successfully", "user_id": user.id}
+        return {"message": "User created successfully", "user_id": user.id}, 200
     except Exception as e:
         session.rollback()
         logging.error(str(e))

@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 import logging
 
 from models.users import User, UserInfo, UserRole, Gender, UserSettings
-from controller_utils import get_first_record_by_criteria
+from controllers.controller_utils import get_first_record_by_criteria
 
 
 def update_user_data(id: int, user_data: dict, session: Session):
