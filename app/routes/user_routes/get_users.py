@@ -3,7 +3,6 @@ from controllers.user_controllers import fetch_users
 from config import get_session
 from .users_blueprint import users_bp
 
-
 @users_bp.route("", methods=['GET'])
 def get_users_handler() -> tuple:
     """
@@ -18,12 +17,15 @@ def get_users_handler() -> tuple:
     try:
         db = next(get_session())  # Call get_session() to get a session
         users = fetch_users(db)
-
+        # DEBUG
+        # print (f"after fetching users. Users:\n{users}")
+        
         if users:
             return {"users": users}, 200
 
         return "Users not found", 404
     except Exception as e:
+        print ("exception fetching users")
         logging.error(f"Error occurred while retrieving users: {str(e)}")
         return "Error finding users", 500
     finally:

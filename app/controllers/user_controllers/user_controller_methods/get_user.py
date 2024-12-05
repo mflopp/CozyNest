@@ -1,10 +1,11 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 import logging
-from flask import abort
+from flask import abort, Response
+from collections import OrderedDict
+import json
 
 from models.users import User, UserInfo, UserRole, Gender, UserSettings
-from controller_utils import get_first_record_by_criteria
 
 
 def fetch_user(id: int, db: Session) -> dict:
@@ -49,27 +50,51 @@ def fetch_user(id: int, db: Session) -> dict:
             abort(404, description="User not found")
 
         # Transform data to the desired format
-        user_data = {
-            "user_id": user.user_id,
-            "email": user.email,
-            "password": user.password,  # Consider excluding sensitive data
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "birthdate": user.birthdate.strftime("%d.%m.%Y"),
-            "gender": user.gender,
-            "phone": user.phone,
-            "role": user.user_role,
-            "user_settings": {
-                "currency": user.currency,
-                "language": user.language
-            },
-            "created_at": user.created_at,
-            "updated_at": user.updated_at
-        }
+        user_data = OrderedDict([
+            ("user_id", user.user_id),
+            ("email", user.email),
+            ("password", user.password),  # Consider excluding sensitive data
+            ("first_name", user.first_name),
+            ("last_name", user.last_name),
+            ("birthdate", user.birthdate.strftime("%d.%m.%Y") if user.birthdate else None),
+            ("gender", user.gender),
+            ("phone", user.phone),
+            ("role", user.user_role),
+            ("user_settings", OrderedDict([
+                ("currency", user.currency),
+                ("language", user.language)
+            ])),
+            ("created_at", user.created_at),
+            ("updated_at", user.updated_at)
+        ])
+        
+        # user_data = {
+        #     "user_id": user.user_id,
+        #     "email": user.email,
+        #     "password": user.password,  # Consider excluding sensitive data
+        #     "first_name": user.first_name,
+        #     "last_name": user.last_name,
+        #     "birthdate": user.birthdate.strftime("%d.%m.%Y") if user.birthdate else None,
+        #     "gender": user.gender,
+        #     "phone": user.phone,
+        #     "role": user.user_role,
+        #     "user_settings": {
+        #         "currency": user.currency,
+        #         "language": user.language
+        #     },
+        #     "created_at": user.created_at,
+        #     "updated_at": user.updated_at
+        # }
 
         logging.info(f"User found with ID {id}")
 
-        return user_data
+        # Use json.dumps to ensure order and return a Response
+        response = Response(
+            response=json.dumps(user_data, default=str),
+            status=200,
+            mimetype='application/json'
+        )
+        return response
     except SQLAlchemyError as e:
         logging.error(f"Database error: {e}")
         abort(500, description="Database error")
