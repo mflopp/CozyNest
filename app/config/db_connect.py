@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 from .db_config import DB_URI
 from .base_config import Base
-
+from .reserved_records import init_reserved_records
 from typing import Generator
 
 # Create SQLAlchemy object for working with the database
@@ -54,6 +54,8 @@ def init_tables() -> None:
     """
     try:
         Base.metadata.create_all(bind=engine)
+        db = next(get_session())
+        init_reserved_records(db)
         print("Connected and tables created.")
     except Exception as e:
         print(f"Error creating tables: {e}")
