@@ -11,6 +11,9 @@ def add_user(user_data: dict, session: Session):
     errors = []
 
     try:
+        # Start a new transaction
+        session.begin_nested()
+        
         # Validate required fields
         required_fields = [
             'email', 'password', 'phone'
@@ -42,20 +45,9 @@ def add_user(user_data: dict, session: Session):
 
         # Find or create gender before any commits
         gender = get_first_record_by_criteria(
-            session, Gender, {"gender": user_data[gender_pre]}
+            session, Gender, {"gender": gender_pre}
         )
-
-        # # Parse the birthdate
-        # birthdate = user_data.get('birthdate')
-        # if birthdate:
-        #     try:
-        #         birthdate = datetime.strptime(birthdate, "%d.%m.%Y").date()
-        #     except ValueError:
-        #         errors.append("Invalid birthdate format. Use DD.MM.YYYY")
-        #         return {"error": "Validation failed", "details": errors}, 400
-            
-        # Start a new transaction
-        session.begin_nested()
+        
         
         # Default UserSettings
         default_currency = 'USD'
@@ -84,15 +76,7 @@ def add_user(user_data: dict, session: Session):
             created_at=func.now(),
             updated_at=func.now()
         )
-        # user_info = UserInfo(
-        #     gender_id=gender.id,
-        #     user_settings_id=user_settings.id,
-        #     first_name=user_data['first_name'],
-        #     last_name=user_data['last_name'],
-        #     birthdate=user_data.get('birthdate'),
-        #     created_at=func.now(),
-        #     updated_at=func.now()
-        # )
+        
         session.add(user_info)
         session.commit()
 

@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 import logging
+from datetime import datetime
 
 from models.users import User, UserInfo, UserRole, Gender, UserSettings
 from controllers.controller_utils import get_first_record_by_criteria
@@ -9,6 +10,9 @@ def update_user_data(id: int, user_data: dict, session: Session):
     errors = []
 
     try:
+        # Start a new transaction
+        session.begin_nested()
+        
         # Fetch the user by ID
         user = get_first_record_by_criteria(
             session,
@@ -42,7 +46,10 @@ def update_user_data(id: int, user_data: dict, session: Session):
                 user_info.last_name = user_data['last_name']
 
             if 'birthdate' in user_data:
-                user_info.birthdate = user_data['birthdate']
+                try:
+                    user_info.birthdate = datetime.strptime(user_data['birthdate'], "%d.%m.%Y").date()
+                except ValueError:
+                    errors.append("Invalid birthdate format. Use DD.MM.YYYY")
 
             if 'gender' in user_data:
                 gender = get_first_record_by_criteria(
@@ -66,8 +73,8 @@ def update_user_data(id: int, user_data: dict, session: Session):
 
             if not user_settings:
                 user_settings = UserSettings(currency=currency, language=language)
-                db.add(user_settings)
-                db.commit()
+                session.add(user_settings)
+                session.commit()
 
             user_info.user_settings_id = user_settings.id
 
