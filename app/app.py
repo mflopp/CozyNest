@@ -19,7 +19,7 @@ def start_app():
         # register_error_handlers(app)
         app.config.update(config_data)
         # init_tables()
-        try_to_test()
+        # try_to_test()
 
         register_all_blueprints(app)
 
