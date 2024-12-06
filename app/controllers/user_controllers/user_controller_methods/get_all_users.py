@@ -19,6 +19,7 @@ def fetch_users(db: Session):
             UserRole.role.label("user_role"),
             UserInfo,
             UserSettings,
+            User.deleted,
             User.created_at,
             User.updated_at
         ).join(UserInfo, User.info_id == UserInfo.id)\
@@ -26,7 +27,10 @@ def fetch_users(db: Session):
          .join(UserRole, User.role_id == UserRole.id)\
          .join(UserSettings, UserInfo.user_settings_id == UserSettings.id)\
          .all()
-
+         
+        if not users:
+            return False
+        
         # Transform data to the desired format
         user_data = [
             {
@@ -43,6 +47,7 @@ def fetch_users(db: Session):
                     "currency": user.UserInfo.settings.currency,
                     "language": user.UserInfo.settings.language
                 },
+                "deleted": user.deleted,
                 "created_at": user.created_at,
                 "updated_at": user.updated_at
             }

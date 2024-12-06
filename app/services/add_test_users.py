@@ -9,7 +9,7 @@ def get_test_roles(session):
     """Returns predefined roles."""
     return {
         "admin": create_role(session, "Admin", "Administrator role"),
-        "owner": create_role(session, "Owner", "Owner of the property role"),
+        # "owner": create_role(session, "Owner", "Owner of the property role"),
         "user": create_role(session, "User", "Regular user role")
     }
 
@@ -26,7 +26,7 @@ def get_test_settings(session):
     """Returns predefined user settings."""
     return {
         "usd_eng": create_setting(session, "USD", "ENG"),
-        "eur_ru": create_setting(session, "EUR", "RU")
+        "eur_ru": create_setting(session, "EUR", "RUS")
     }
 
 

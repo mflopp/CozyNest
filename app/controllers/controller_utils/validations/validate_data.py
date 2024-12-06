@@ -1,12 +1,14 @@
 from typing import Type, Dict, List, Any
 from sqlalchemy.orm import Session
-from models.users import User
+from models.users import User, UserSettings
 
 from .validate_unique import validate_unique_fields
 from .validate_required_fields import validate_required_fields
 from .validate_pswrd import validate_password
 from .validate_phone import validate_phone
 from .validate_email import validate_email
+from .validate_currency import validate_currency
+from .validate_language import validate_language
 
 
 def validate_data(
@@ -50,3 +52,12 @@ def validate_data(
             validate_email(email)
         if password:
             validate_password(password)
+
+    if issubclass(Model, UserSettings):
+        currency = data.get('currency', '')
+        language = data.get('language', '')
+
+        if currency:
+            validate_currency(currency)
+        if language:
+            validate_language(language)

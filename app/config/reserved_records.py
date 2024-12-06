@@ -22,16 +22,11 @@ def init_reserved_records(session):
             role="Admin",
             description="Administrator role"
         )
-        user_role_owner = UserRole(
-            role="Owner",
-            description="Owner of the property role"
-        )
         user_role_user = UserRole(
             role="User",
             description="Regular user role"
         )
         session.add(user_role_admin)
-        session.add(user_role_owner)
         session.add(user_role_user)
         session.commit()
         logging.info(f"Default user roles created")
