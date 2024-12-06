@@ -78,7 +78,7 @@ def test_users_create_if_not_exist() -> None:
 
         # Create roles
         create_role_if_not_exists("Admin", "Administrator role")
-        create_role_if_not_exists("Owner", "Owner of the property role")
+        # create_role_if_not_exists("Owner", "Owner of the property role")
         create_role_if_not_exists("User", "Regular user role")
 
         # Create genders
@@ -87,7 +87,7 @@ def test_users_create_if_not_exist() -> None:
 
         # Create settings
         create_setting_if_not_exists("USD", "ENG")
-        create_setting_if_not_exists("EUR", "RU")
+        create_setting_if_not_exists("EUR", "RUS")
 
         # Create user info
         create_info_if_not_exists(
