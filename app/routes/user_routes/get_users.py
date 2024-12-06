@@ -2,6 +2,9 @@ import logging
 from controllers.user_controllers import fetch_users
 from config import get_session
 from .users_blueprint import users_bp
+from flask import make_response
+from collections import OrderedDict
+import json
 
 @users_bp.route("", methods=['GET'])
 def get_users_handler() -> tuple:
@@ -17,11 +20,13 @@ def get_users_handler() -> tuple:
     try:
         db = next(get_session())  # Call get_session() to get a session
         users = fetch_users(db)
-        # DEBUG
-        # print (f"after fetching users. Users:\n{users}")
         
         if users:
-            return {"users": users}, 200
+            response_data = OrderedDict([("users", users)])
+            response_json = json.dumps(response_data, default=str, sort_keys=False)
+            response = make_response(response_json, 200)
+            response.headers['Content-Type'] = 'application/json'
+            return response
 
         return "Users not found", 404
     except Exception as e:

@@ -64,20 +64,6 @@ def init_reserved_records(session):
         session.commit()
         logging.info(f"Default user settings created")
         
-        # Create UserInfo
-        user_info = UserInfo(
-            gender_id=1,
-            user_settings_id=1,
-            first_name='first_name',
-            last_name='last_name',
-            birthdate = "01.01.1900",
-            created_at=func.now(),
-            updated_at=func.now()
-        )
-        session.add(user_info)
-        session.commit()
-        logging.info(f"Default user info created")
-        
     except Exception as e:
-        print(f"Error inserting default values (User roles, user settings, user info, genders): {e}")
+        print(f"Error inserting default values (User roles, user settings, genders): {e}")
 
