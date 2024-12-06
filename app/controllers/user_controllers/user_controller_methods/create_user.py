@@ -13,7 +13,7 @@ def add_user(user_data: dict, session: Session):
     try:
         # Start a new transaction
         session.begin_nested()
-        
+
         # Validate required fields
         required_fields = [
             'email', 'password', 'phone'
@@ -40,15 +40,14 @@ def add_user(user_data: dict, session: Session):
 
         if errors:
             return {"error": "Validation failed", "details": errors}, 400
-        
+
         gender_pre = "Male"
 
         # Find or create gender before any commits
         gender = get_first_record_by_criteria(
             session, Gender, {"gender": gender_pre}
         )
-        
-        
+
         # Default UserSettings
         default_currency = 'USD'
         default_language = 'ENG'
@@ -68,15 +67,15 @@ def add_user(user_data: dict, session: Session):
 
         # Create UserInfo
         user_info = UserInfo(
-            gender_id=gender.id, # may cause trouble
-            user_settings_id=1, # may cause trouble
+            gender_id=gender.id,    # may cause trouble
+            user_settings_id=1,     # may cause trouble
             first_name='first_name',
             last_name='last_name',
-            birthdate = None,
+            birthdate=None,
             created_at=func.now(),
             updated_at=func.now()
         )
-        
+
         session.add(user_info)
         session.commit()
 
@@ -100,7 +99,10 @@ def add_user(user_data: dict, session: Session):
         session.commit()
 
         logging.info(f"User created successfully with ID {user.id}")
-        return {"message": "User created successfully", "user_id": user.id}, 200
+        return (
+            {"message": "User created successfully", "user_id": user.id},
+            200
+        )
     except Exception as e:
         session.rollback()
         logging.error(str(e))
