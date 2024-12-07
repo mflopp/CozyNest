@@ -29,6 +29,7 @@ def fetch_users(db: Session):
          .all()
          
         if not users:
+            logging.info(f"Users not found in the DB")
             return False
         
         # Transform data to the desired format
@@ -58,4 +59,4 @@ def fetch_users(db: Session):
         return user_data
     except Exception as e:
         logging.error(str(e))
-        abort(500)
+        raise

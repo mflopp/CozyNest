@@ -1,9 +1,9 @@
 from flask import request
 import logging
-from controllers.user_controllers import update_user_data
-from config import get_session
+from controllers import UserController
 from .users_blueprint import users_bp
-
+from utils import create_response
+from config import session_scope
 
 @users_bp.route("/<int:id>", methods=['PUT'])
 def update_user_handler(id: int) -> tuple:
@@ -17,17 +17,19 @@ def update_user_handler(id: int) -> tuple:
     Returns:
         tuple: A tuple with the response and HTTP status code.
     """
-    db = None
-
     try:
-        db = next(get_session())  # Get a session
-        user_data = request.get_json()
-        response = update_user_data(id, user_data, db)
+        # Use the session_scope context manager
+        with session_scope() as session:
+            user_data = request.get_json()
+            response = UserController.update(id, user_data, session)
+            return create_response(
+                data=[("user", response)],
+                code=200
+            )
 
-        return response, 200
     except Exception as e:
-        logging.error(f"Error occurred while updating user {id}: {str(e)}")
-        return "Error updating user", 500
-    finally:
-        if db:
-            db.close()  # Ensure the database session is properly closed
+        logging.error(f"Error occurred while updating user ID {id}: {str(e)}")
+        return create_response(
+            data=[("error", f"Error updating user ID {id}: {str(e)}")],
+            code=500
+        )

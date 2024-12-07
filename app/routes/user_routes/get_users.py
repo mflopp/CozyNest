@@ -1,13 +1,11 @@
 import logging
-from controllers.user_controllers import fetch_users
-from config import get_session
+from controllers import UserController
 from .users_blueprint import users_bp
-from flask import make_response
-from collections import OrderedDict
-import json
+from utils import create_response
+from config import session_scope
 
 @users_bp.route("", methods=['GET'])
-def get_users_handler() -> tuple:
+def get_users_handler() -> list:
     """
     Endpoint for retrieving all users from the database.
     Returns a list of users or an error message if not found.
@@ -15,23 +13,22 @@ def get_users_handler() -> tuple:
     Returns:
         tuple: A tuple with the response and HTTP status code.
     """
-    db = None
-
     try:
-        db = next(get_session())  # Call get_session() to get a session
-        users = fetch_users(db)
-        
-        if users:
-            response_data = OrderedDict([("users", users)])
-            response_json = json.dumps(response_data, default=str, sort_keys=False)
-            response = make_response(response_json, 200)
-            response.headers['Content-Type'] = 'application/json'
-            return response
+        # Use the session_scope context manager
+        with session_scope() as session:
+            users = UserController.get_all(session)
+            
+            if users:
+                return create_response(
+                    data=[("users", users)],
+                    code=200
+                )
 
-        return "Users not found", 404
+            return "Users not found", 404
     except Exception as e:
         logging.error(f"Error occurred while retrieving users: {str(e)}")
-        return "Error finding users", 500
-    finally:
-        if db:
-            db.close()  # Ensure the database session is properly closed
+        return create_response(
+            data=[("error", f"Error finding users: {str(e)}")],
+            code=500
+        )
+

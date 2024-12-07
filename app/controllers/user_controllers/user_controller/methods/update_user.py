@@ -36,14 +36,12 @@ def update_user_data(id: int, user_data: dict, session: Session):
             user_setting_id = update_user_setting(user_info.user_settings_id, user_data, session)
             if not user_setting_id:
                 user_setting_id = user_info.user_settings_id
-                
             # Fetch UserRole
             if 'role' in user_data:
                 role = fetch_user_role (user_data, session)
                 if not role:
                     raise ValueError(f"Error: User role {user_data['role']} was not found in the DB")  
                 user.role_id = role.id
-
             # Fetch Gender
             if 'gender' in user_data:
                 gender = get_first_record_by_criteria(
@@ -61,9 +59,8 @@ def update_user_data(id: int, user_data: dict, session: Session):
                
 
         # Commit the changes
-        session.commit()
+        session.flush()
         logging.info(f"User with ID {id} updated successfully")
-        return {"message": "User updated successfully"}
+        return {f"User with ID {id} updated successfully"}
     except (ValueError, Exception) as e:
-        logging.error(str(e))
-        return {"error": "Error updating user", "details": str(e)}, 500
+        raise
