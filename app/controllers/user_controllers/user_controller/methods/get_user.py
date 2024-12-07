@@ -45,6 +45,7 @@ def fetch_user(id: int, db: Session) -> dict:
          .first()
 
         if not user:
+            logging.info(f"User with ID {id} not found")
             return False
 
         logging.info(f"User found with ID {id}")
@@ -52,7 +53,7 @@ def fetch_user(id: int, db: Session) -> dict:
         return user
     except SQLAlchemyError as e:
         logging.error(f"Database error: {e}")
-        return {"error": "Database error", "details: ": str(e)}, 500
+        raise
     except Exception as e:
         logging.error(str(e))
-        return {"error": "Error getting a user", "details: ": str(e)}, 500
+        raise

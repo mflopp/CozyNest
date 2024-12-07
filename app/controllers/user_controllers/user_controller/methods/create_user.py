@@ -7,7 +7,7 @@ from controllers.controller_utils.validations import validate_data
 from controllers.user_controllers.user_settings_controller_methods import fetch_user_setting
 from controllers.user_controllers.user_info_controller_methods import add_user_info
 from controllers.user_controllers.user_role_controller_methods import fetch_user_role
-
+from utils.api_error import ValidationError
 from controllers.controller_utils import get_first_record_by_criteria
 
 
@@ -64,18 +64,15 @@ def add_user(user_data: dict, session: Session):
                 updated_at=func.now()
             )
 
-            response, status = add_record(session, user, 'user')
-            if status != 200:
-                logging.error(f"user was not created, Error: {response}")
-                raise Exception(f"Failed to create user, Error: {response}")
+            add_record(session, user, 'user')
 
         # commit the transaction after 'with' block
-        session.commit()            
+        session.flush()            
         logging.info(f"User created successfully with ID {user.id}")
-        return (
-            {"message": "User created successfully", "user_id": user.id},
-            200
-        )
+        return user
+    
+    except ValidationError:
+        raise
     except (ValueError, Exception) as e:
-        logging.error(str(e))
-        return {"error": "Error creating user", "details": str(e)}, 500
+        logging.error(f"Error creating user: {str(e)}")
+        raise

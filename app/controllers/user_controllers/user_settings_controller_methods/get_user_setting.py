@@ -22,5 +22,5 @@ def fetch_user_setting(user_data: dict, session: Session):
 
     except Exception as e:
         session.rollback()
-        logging.error(str(e))
-        return {"error": "Error getting a user setting", "details: ": str(e)}, 500
+        logging.error(f"Error getting a user setting: {str(e)}")
+        raise

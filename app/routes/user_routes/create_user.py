@@ -1,10 +1,10 @@
 from flask import request
 import logging
-
-from controllers.user_controllers import add_user
-from config import get_session
+from controllers import UserController
+from utils.api_error import ValidationError
 from .users_blueprint import users_bp
-
+from utils import create_response
+from config import session_scope
 
 @users_bp.route("", methods=['POST'])
 def create_user_handler() -> tuple:
@@ -15,18 +15,36 @@ def create_user_handler() -> tuple:
     Returns:
         tuple: A tuple with the response and HTTP status code.
     """
-    db = None
-
     try:
-        db = next(get_session())
+        # Use the session_scope context manager
+        with session_scope() as session:
 
-        user_data = request.get_json()
-        response, status = add_user(user_data, db)
-
-        return response, status
+            user_data = request.get_json()
+            user = UserController.create(user_data, session)
+            return create_response(
+                data=[
+                    ("message", "user successfully created"),
+                    ("id", user.id),
+                    ("email", user.email),
+                    ("password", user.password),
+                    ("phone", user.phone),
+                    ("role_id", user.role_id),
+                    ("info_id", user.info_id)
+                    ],
+                code=200
+            )
+                
+    except ValidationError as err:
+        logging.error(f"Error occurred while creating country: {str(err)}")
+        return create_response(
+            data=[("error", str(err))],
+            code=400
+        )
+        
     except Exception as e:
         logging.error(f"Error occurred while creating user: {str(e)}")
-        return {"error": "Error creating user"}, 500
-    finally:
-        if db:
-            db.close()
+        return create_response(
+            data=[("error", f"Error creating user: {str(e)}")],
+            code=500
+        )
+
