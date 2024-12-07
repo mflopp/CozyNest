@@ -48,10 +48,11 @@ def del_user(id: int, session: Session):
             # del_record(session, user, 'user')
 
             # Commit the changes
-            session.commit()
+        session.commit()
 
-            logging.info(f"User ID:{id} and associated data deleted successfully")
-            return {"message": "User and associated data deleted successfully", "id": id}, 200
+        logging.info(f"User ID:{id} and associated data deleted successfully")
+        return {"message": "User and associated data deleted successfully", "id": id}, 200
     except Exception as e:
+        session.rollback()
         logging.error(f"Error deleting user {id}: {str(e)}", exc_info=True)
         return {"error": "Error deleting user", "details": str(e)}, 500

@@ -3,6 +3,7 @@ from .get_user_setting import fetch_user_setting
 from .get_user_settings import fetch_user_settings
 from .delete_user_setting import del_user_setting
 from .get_user_setting_by_id import fetch_user_setting_by_id
+from .update_user_setting import update_user_setting
 
 
 __all__ = [
@@ -10,5 +11,6 @@ __all__ = [
     'fetch_user_setting',
     'fetch_user_settings',
     'del_user_setting',
-    'fetch_user_setting_by_id'
+    'fetch_user_setting_by_id',
+    'update_user_setting'
 ]
