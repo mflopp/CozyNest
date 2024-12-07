@@ -20,7 +20,7 @@ def del_record(session, record, entity_name):
     try:
 
         session.delete(record)
-        session.commit()
+        session.flush()
         log_message = f"{record.id} successfully deleted in {entity_name}."
         message = f"{entity_name} was deleted!"
 
@@ -54,13 +54,13 @@ def delete_record(session: Session, record, entity: str):
         # Attempt to delete the record
         with session.begin_nested():
             session.delete(record)
-            session.commit()
+            session.flush()
 
             log_message = f"{record.id} successfully deleted from {entity}"
             success_message = f"{entity} was deleted."
 
-            logging.info(log_message)
-            return {"message": success_message, "id": record.id}, 200
+        logging.info(log_message)
+        return {"message": success_message, "id": record.id}, 200
     except Exception as e:
         error_message = f"Failed to delete record from {entity}"
         logging.error(f"{error_message}: {str(e)}")

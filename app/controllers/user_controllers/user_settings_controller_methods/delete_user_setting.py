@@ -1,6 +1,6 @@
 import logging
 from sqlalchemy.orm import Session
-from controllers.general_controllers import del_record
+from controllers.general_controllers import delete_record
 from models.users import UserInfo
 
 from controllers.controller_utils import get_first_record_by_criteria
@@ -29,7 +29,7 @@ def del_user_setting(id: int, session: Session):
                 logging.error(f"Error deleting user setting {id}", exc_info=True)
                 return {"error": "Impossible delete user setting. This user setting ID is in use", "user_settings_id": id}, 500
 
-            response, status = del_record(session, user_setting, 'user settings')
+            response, status = delete_record(session, user_setting, 'user settings')
             if status!= 200:
                 logging.error(f"user setting was not deleted (del_user_setting), Error: {response}")
                 raise Exception(f"Failed to delete user setting, Error: {response}")
@@ -39,6 +39,5 @@ def del_user_setting(id: int, session: Session):
         logging.info(f"User setting ID:{id} deleted successfully")
         return {"message": "User setting deleted successfully", "id": id}, 200
     except Exception as e:
-        session.rollback() # Rollback if there's an error
         logging.error(f"Error deleting user setting {id}: {str(e)}", exc_info=True)
         return {"error": "Error deleting user setting", "details: ": str(e)}, 500

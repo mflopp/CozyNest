@@ -34,6 +34,5 @@ def update_user_setting(id: int, user_data: dict, session: Session):
                 return False
 
     except Exception as e:
-        session.rollback()
         logging.error(str(e))
         return {"error": "Error getting a user setting", "details: ": str(e)}, 500
