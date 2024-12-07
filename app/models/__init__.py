@@ -1,14 +1,56 @@
-from .accommodations import *
-from .addresses import *
-from .reviews import *
-from .orders import *
-from .users import *
+from .accommodations import AccommodationImage
+from .accommodations import AccommodationType
+from .accommodations import AccommodationAvailability
+from .accommodations import AmenitiesCategory
+from .accommodations import Amenity
+from .accommodations import AccommodationAmenity
+from .accommodations import Rule
+from .accommodations import AccommodationRule
+from .accommodations import SleepingPlace
+from .accommodations import AccommodationSleepingPlace
+from .accommodations import Accommodation
+
+from .addresses import Address
+from .addresses import City
+from .addresses import Country
+from .addresses import Region
+
+from .reviews import Review
+
+from .orders import Order
+
+from .users import User
+from .users import UserSettings
+from .users import UserInfo
+from .users import UserRole
+from .users import Gender
 
 
 __all__ = [
-    *accommodations.__all__,
-    *addresses.__all__,
-    *reviews.__all__,
-    *orders.__all__,
-    *users.__all__,
+    'AccommodationImage',
+    'AccommodationType',
+    'AccommodationAvailability',
+    'AmenitiesCategory',
+    'Amenity',
+    'AccommodationAmenity',
+    'Rule',
+    'AccommodationRule',
+    'SleepingPlace',
+    'AccommodationSleepingPlace',
+    'Accommodation',
+
+    'Address',
+    'City',
+    'Country',
+    'Region',
+
+    'Review',
+
+    'Order',
+
+    'User',
+    'UserSettings',
+    'UserInfo',
+    'UserRole',
+    'Gender'
 ]
