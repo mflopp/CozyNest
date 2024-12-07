@@ -1,5 +1,6 @@
 import logging
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 
 logging.basicConfig(level=logging.INFO)
 
@@ -15,33 +16,38 @@ def save_record(session: Session, record: object) -> None:
     Raises:
         SQLAlchemyError: If an error occurs while saving the record.
     """
-    session.add(record)
-    session.commit()
+    try:
+        with session.begin_nested():
+            session.add(record)
+            session.commit()
+            logging.info("Record saved to database session successfully.")
+    except SQLAlchemyError as e:
+        logging.error(f"Failed to save record: {str(e)}")
+        raise e
 
 
-def add_record(session, record, entity_name):
+def add_record(session: Session, record, entity: str):
     """
     Adds a record to the database session and commits the transaction.
 
     Args:
         session (Session): The database session.
         record: The record to be added (must have an 'id' attribute).
-        entity_name (str): The name of the entity (e.g., 'User', 'Product').
+        entity (str): The name of the entity (e.g., 'User', 'Order').
 
     Returns:
         dict: A dictionary containing the status message and record ID
         or error message.
     """
     try:
-        save_record(session, record)
+        with session.begin_nested():
+            save_record(session, record)
 
-        log_message = f"{record.id} successfully created in {entity_name}."
-        message = f"{entity_name} was created!"
+            message = f"Record successfully created in {entity}: {record.id}"
+            logging.info(message)
 
-        logging.info(log_message)
-        return {'message': message, 'id': record.id}, 200
-    except Exception as e:
-        session.rollback()
-        message = f"Failed to create {record} in {entity_name}"
-        logging.error(f'{message}: {str(e)}')
-        return {'error': message, 'details': str(e)}, 500
+            return {'message': message, 'id': record.id}, 200
+    except SQLAlchemyError as e:
+        error_message = f"Failed to create {record} in {entity}"
+        logging.error(f'{error_message}: {str(e)}')
+        return {'error': error_message, 'details': str(e)}, 500
