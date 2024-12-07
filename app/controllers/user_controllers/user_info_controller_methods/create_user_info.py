@@ -5,12 +5,13 @@ from models.users import UserInfo
 from sqlalchemy.sql import func
 
 
-def add_user_info(user_data: dict, gender_id: int, user_settings_id: int, session: Session):
-    
+def add_user_info(user_data: dict, gender_id: int,
+                  user_settings_id: int, session: Session):
+
     try:
         # Start a new transaction
         with session.begin_nested():
-            
+
             # Create UserInfo
             user_info = UserInfo(
                 gender_id=gender_id,
@@ -24,12 +25,13 @@ def add_user_info(user_data: dict, gender_id: int, user_settings_id: int, sessio
 
             response, status = add_record(session, user_info, 'user info')
             if status != 200:
-                logging.error(f"user info was not created, Error: {response}")
-                raise Exception(f"Failed to create user info, Error: {response}")
+                logging.error(f"user info was not created, Err: {response}")
+                raise Exception(f"Failed to create user info, Err: {response}")
 
         session.flush()
         response = user_info.id
         return response, status
     except Exception as e:
         logging.error(str(e))
-        return {"error": "Error creating a user info", "details: ": str(e)}, 500
+        return ({"error": "Error creating a user info", "details: ": str(e)},
+                500)
