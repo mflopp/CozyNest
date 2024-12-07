@@ -1,30 +1,48 @@
 import logging
+from flask import Response
 
 from controllers import CountryController
 from .countries_blueprint import country_bp
 from utils import create_response
 from config import session_scope
 
+
 @country_bp.route("/<int:id>", methods=['DELETE'])
-def delete_country_handler(id: int) -> tuple:
+def delete_country_handler(id: int) -> Response:
     """
-    Endpoint for creating a new user setting. Receives user data as JSON and returns
-    the result of creating a user setting in the database.
+    Handle DELETE request to delete a country by its ID.
+
+    Args:
+        id (int): ID of the country to be deleted.
 
     Returns:
-        tuple: A tuple with the response and HTTP status code.
+        Response: JSON response indicating the success or failure of
+                  the operation.
+
+    Raises:
+        Logs unexpected exceptions and returns a 500 error response.
     """
     try:
-        # Use the session_scope context manager
+        # Using session_scope context manager for database session
         with session_scope() as session:
+            # Call the controller's delete method
             message, status = CountryController.delete(id, session)
+
+            # Return the appropriate response
             return create_response(
                 data=[("info", message)],
                 code=status
             )
     except Exception as e:
-        logging.error(f"Error occurred while deleteting country data: {str(e)}")
+        # Log unexpected errors with traceback
+        logging.error(
+            f"Error occurred while deleting country with ID {id}: {str(e)}",
+            exc_info=True
+            )
         return create_response(
-            data=[("error", "Error deleteting country data")],
+            data=[(
+                "error",
+                "An unexpected error occurred while deleting country data."
+            )],
             code=500
         )

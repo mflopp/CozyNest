@@ -1,37 +1,56 @@
 import logging
+from flask import Response
+
 from controllers import CountryController
 from .countries_blueprint import country_bp
 from utils import create_response
 from config import session_scope
 
+
 @country_bp.route("/<int:id>", methods=['GET'])
-def get_country_by_id_handler(id: int) -> tuple:
+def get_country_by_id_handler(id: int) -> Response:
     """
-    Endpoint for creating a new user setting. Receives user data as JSON and returns
-    the result of creating a user setting in the database.
+    Handle GET request to retrieve a country by its ID.
+
+    Args:
+        id (int): ID of the country to retrieve.
 
     Returns:
-        tuple: A tuple with the response and HTTP status code.
+        Response: JSON response containing the country data or
+                  an error message.
+
+    Raises:
+        Logs unexpected exceptions and returns a 500 error response.
     """
     try:
-        # Use the session_scope context manager
+        # Using session_scope context manager for database session
         with session_scope() as session:
-
+            # Retrieve the country from the database
             country = CountryController.get_one_by_id(id, session)
+
+            # Return the country data if found
             if country:
                 return create_response(
                     data=[("countries", country)],
                     code=200
                 )
-            else:
-                return create_response(
-                    data=[("message", "Countries not found")],
-                    code=404
-                )
+
+            # Handle the case where the country is not found
+            return create_response(
+                data=[("message", "Countries not found")],
+                code=404
+            )
 
     except Exception as e:
-        logging.error(f"Error occurred while getting country data: {str(e)}")
+        # Log unexpected errors with traceback
+        logging.error(
+            f"Error occurred while retrieving country with ID {id}: {str(e)}",
+            exc_info=True
+        )
         return create_response(
-            data=[("error", "Error getting country data")],
+            data=[(
+                "error",
+                "An unexpected error occurred while retrieving country data."
+            )],
             code=500
         )

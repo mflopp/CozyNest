@@ -1,43 +1,62 @@
-from flask import request
 import logging
+from flask import Response, request
 
 from controllers import CountryController
-from config import get_session
 from .countries_blueprint import country_bp
-from flask import make_response
-from collections import OrderedDict
-import json
+from utils import create_response
+from config import session_scope
+
 
 @country_bp.route("/name", methods=['GET'])
-def get_country_by_name_handler() -> tuple:
+def get_country_by_name_handler() -> Response:
     """
-    Endpoint for creating a new user setting. Receives user data as JSON and returns
-    the result of creating a user setting in the database.
+    Handle GET request to retrieve a country by its name.
 
     Returns:
-        tuple: A tuple with the response and HTTP status code.
+        Response: JSON response containing the country data or
+                  an error message.
+
+    Raises:
+        Logs unexpected exceptions and returns a 500 error response.
     """
-    session = None
-
     try:
-        session = next(get_session())
-        country_name = request.get_json()
-        if not country_name['name']:
-            return "Users not found", 404
-        country_name = country_name['name']
-        country = CountryController.get_one_by_name(country_name, session)
-        if country:
-            response_data = OrderedDict([("country", country)])
-            response_json = json.dumps(response_data, default=str, sort_keys=False)
-            response = make_response(response_json, 200)
-            response.headers['Content-Type'] = 'application/json'
-            return response
+        # Extract country name from query parameters
+        country_name = request.args.get('name')
+        if not country_name:
+            return create_response(
+                data=[("error", "Country name is required")],
+                code=400
+            )
 
-        return "Users not found", 404
+        # Using session_scope context manager for database session
+        with session_scope() as session:
+            # Retrieve the country from the database
+            country = CountryController.get_one_by_name(country_name, session)
+
+            # Return the country data if found
+            if country:
+                return create_response(
+                    data=[("countries", country)],
+                    code=200
+                )
+
+            # Handle the case where the country is not found
+            return create_response(
+                data=[("message", "Countries not found")],
+                code=404
+            )
+
     except Exception as e:
-        logging.error(f"Error occurred while getting country data: {str(e)}")
-        return {"error": "Error getting country data"}, 500
-    finally:
-        if session:
-            session.close()
-            
+        # Log unexpected errors with traceback
+        details = f"{country_name}: {str(e)}"
+        logging.error(
+            f"Error occurred while retrieving country with name {details}",
+            exc_info=True
+        )
+        return create_response(
+            data=[(
+                "error",
+                "An unexpected error occurred while retrieving country data."
+            )],
+            code=500
+        )
