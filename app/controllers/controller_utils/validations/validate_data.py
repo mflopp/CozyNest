@@ -16,7 +16,7 @@ def validate_data(
     Model: Type[Any],
     data: Dict[str, Any],
     required_fields: List[str],
-    unique_fields: List[str]
+    unique_fields: List[str] = []
 ) -> None:
     """
     Validates input data for a given model, checking required fields,
