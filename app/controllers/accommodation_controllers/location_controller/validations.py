@@ -1,5 +1,5 @@
 from .utils import throw_error
-from typing import Set
+from typing import Set, Any
 
 
 def validate_field(field_name: str, valid_fields: Set[str]) -> None:
@@ -21,7 +21,7 @@ def validate_field(field_name: str, valid_fields: Set[str]) -> None:
         )
 
 
-def validate_value(value: str | int | None, field_name: str) -> None:
+def validate_value(value: Any, field_name: str) -> None:
     """
     Validates the value for a given field.
 
@@ -36,7 +36,7 @@ def validate_value(value: str | int | None, field_name: str) -> None:
         throw_error(400, f"Invalid value for field '{field_name}': {value}")
 
 
-def validate_id(value: int, field_name: str) -> None:
+def validate_id(value: Any, field_name: str) -> None:
     """
     Validates that the value for the 'id' field is an integer.
 
