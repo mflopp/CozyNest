@@ -22,7 +22,7 @@ def create_user_setting_handler() -> tuple:
 
         user_setting = request.get_json()
         response, status = add_user_setting(user_setting, db)
-
+        print(f"\033[34m ############# create_user_setting_handler: {response}\033[0m")
         return response, status
     except Exception as e:
         logging.error(f"Error occurred while creating user setting: {str(e)}")
@@ -30,3 +30,5 @@ def create_user_setting_handler() -> tuple:
     finally:
         if db:
             db.close()
+            print("\033[34m ############# after closing DB\033[0m")
+        print("\033[34m ############# outside cloding DB\033[0m")
