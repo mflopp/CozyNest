@@ -45,9 +45,8 @@ def update_user_info(id: int, user_data: dict, gender_id: int, user_settings_id:
             user_info.updated_at = func.now()
 
         # commit the transaction after 'with' block
-        session.commit()
+        session.flush()
         return {"user info successfully updated"}, 200
     except Exception as e:
-        session.rollback()
         logging.error(str(e))
         return {"error": "Error updating a user info", "details: ": str(e)}, 500

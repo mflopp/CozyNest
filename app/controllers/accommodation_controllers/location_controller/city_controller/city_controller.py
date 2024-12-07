@@ -7,7 +7,9 @@ from .methods import create_city, delete_city, get_city, get_cities
 class CityController:
     @staticmethod
     def create(data: dict, session: Session) -> City:
-        return create_city(data, session)
+        city = create_city(data, session)
+        session.commit()
+        return city
 
     @staticmethod
     def get_one_by_id(city_id: int, session: Session) -> City:

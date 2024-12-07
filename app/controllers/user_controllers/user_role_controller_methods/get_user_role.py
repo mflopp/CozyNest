@@ -12,6 +12,7 @@ def fetch_user_role(user_data: dict, session: Session):
             UserRole,
             {'role': user_data['role']}
         )
+
         if user_role:
             return user_role
         else:

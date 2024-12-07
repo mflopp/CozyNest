@@ -43,7 +43,7 @@ def update_user_data(id: int, user_data: dict, session: Session):
                 if not role:
                     raise ValueError(f"Error: User role {user_data['role']} was not found in the DB")  
                 user.role_id = role.id
-            
+
             # Fetch Gender
             if 'gender' in user_data:
                 gender = get_first_record_by_criteria(
@@ -57,10 +57,7 @@ def update_user_data(id: int, user_data: dict, session: Session):
                 gender_id = user_info.gender_id
 
             # Fetch and update UserInfo (replace to functions from userInfo models)
-            response, status = update_user_info(user.id, user_data, gender_id, user_setting_id, session)
-            if status!= 200:
-                logging.error(f"user info was not updated (update_user), Error: {response}")
-                raise Exception(f"Failed to update user info, Error: {response}")
+            update_user_info(user_info.id, user_data, gender_id, user_setting_id, session)
                
 
         # Commit the changes
@@ -68,6 +65,5 @@ def update_user_data(id: int, user_data: dict, session: Session):
         logging.info(f"User with ID {id} updated successfully")
         return {"message": "User updated successfully"}
     except (ValueError, Exception) as e:
-        session.rollback()
         logging.error(str(e))
         return {"error": "Error updating user", "details": str(e)}, 500

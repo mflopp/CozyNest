@@ -1,10 +1,9 @@
 import logging
 from sqlalchemy.orm import Session
-from controllers.general_controllers import del_record
-from models.users import UserInfo
-
+from controllers.general_controllers import delete_record
 from controllers.controller_utils import get_first_record_by_criteria
 from .get_user_info import fetch_user_info
+from models.users import User
 
 def del_user_info(id: int, session: Session):
     
@@ -13,30 +12,27 @@ def del_user_info(id: int, session: Session):
         with session.begin_nested():
 
             # Getting user setting by id from the DB
-            user_setting = fetch_user_info(id, session)
+            user_info = fetch_user_info(id, session)
             
-            if not user_setting:
-                return {"error": f"User setting ID {id} not found"}, 404
+            if not user_info:
+                return {"error": f"User info ID {id} not found"}, 404
             
-            # This can be REPLACED by user info controller method
-            user_info = get_first_record_by_criteria(
+            # check if user exists with user_info_id = user_info.id
+            user = get_first_record_by_criteria(
                 session,
-                UserInfo,
-                {"user_settings_id": id}
+                User,
+                {'info_id': user_info.id}
             )
-            if user_info:
-                logging.error(f"Error deleting user setting {id}", exc_info=True)
-                return {"error": "Impossible delete user setting. This user setting ID is in use", "user_settings_id": id}, 500
-
-            response, status = del_record(session, user_setting, 'user settings')
-            if status!= 200:
-                logging.error(f"user info was not deleted (del_user_info), Error: {response}")
-                raise Exception(f"Failed to delete user info, Error: {response}")
+            if user:
+                logging.error(f"user info can't be deleted there is a record in user table with such user info ID (del_user_info): {user_info.id}")
+                raise Exception("user info can't be deleted there is a record in user table with such user info ID")
+            
+            delete_record(session, user_info, 'user settings')
         
         # commit the transaction after 'with' block
         session.commit()
-        logging.info(f"User setting ID:{id} deleted successfully")
-        return {"message": "User setting deleted successfully", "id": id}, 200
+        logging.info(f"User info ID:{id} deleted successfully")
+        return {"message": "User info deleted successfully", "id": id}, 200
     except Exception as e:
         session.rollback()
         logging.error(f"Error deleting user setting {id}: {str(e)}", exc_info=True)

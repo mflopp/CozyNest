@@ -27,7 +27,7 @@ def update_user_setting(id: int, user_data: dict, session: Session):
                 user_setting_id = response["id"]
                 
                 # commit the transaction within 'with' block
-                session.commit()
+                session.flush()
                 
                 return user_setting_id
             else:
