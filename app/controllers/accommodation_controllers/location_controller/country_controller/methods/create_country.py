@@ -39,23 +39,13 @@ def create_country(data: dict, session: Session) -> Country:
             new_country = Country(name=data['name'])
 
             # Attempt to add the record
-            result, status_code = add_record(
+            response, status = add_record(
                 session=session,
                 record=new_country,
                 entity="Country"
             )
 
-            # Log the successful creation with the correct object reference
-            if status_code == 200:
-                logging.info(
-                    f"Country successfully created with ID: {new_country.id}"
-                )
-                return new_country
-
-            return throw_error(
-                500,
-                f"Failed to create country '{new_country.name}'."
-            )
+        return response, status
     except Exception as e:
         logging.error(f"Unexpected error during region creation: {e}")
         raise

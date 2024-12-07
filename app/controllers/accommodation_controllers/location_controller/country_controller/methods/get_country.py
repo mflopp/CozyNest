@@ -35,12 +35,12 @@ def get_country(field: str, value: any, session: Session) -> Country:
         # Build filter criteria
         filter_criteria = set_filter_criteria(field, value)
         logging.debug(f"Filter criteria created: {filter_criteria}")
-
+        
         # Retrieve the record
         country = fetch_record(
             session=session,
             Model=Country,
-            filter_criteria=filter_criteria,
+            criteria=filter_criteria,
             model_name='Countries'
         )
 
