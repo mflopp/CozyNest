@@ -1,25 +1,30 @@
 from typing import List, Dict
 from sqlalchemy.orm import Session
 from models import Country
-from .methods import create_country, delete_country, get_country, get_countries, update_country
+
+from .methods import create_country
+from .methods import delete_country
+from .methods import get_country
+from .methods import get_countries
+from .methods import update_country
 
 
 class CountryController:
     @staticmethod
     def create(data: dict, session: Session) -> Country:
-        response, status = create_country(data, session)
+        country = create_country(data, session)
         session.commit()
-        return response, status
+        return country
 
     @staticmethod
     def get_one_by_id(country_id: int, session: Session) -> Country:
-        contry = get_country(field='id', value=country_id, session=session)
+        contry = get_country('id', country_id, session)
         session.commit()
         return contry
 
     @staticmethod
     def get_one_by_name(country_name: str, session: Session) -> Country:
-        country = get_country(field='name', value=country_name, session=session)
+        country = get_country('name', country_name, session)
         session.commit()
         return country
 
