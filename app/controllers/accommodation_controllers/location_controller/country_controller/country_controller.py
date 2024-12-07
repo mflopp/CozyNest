@@ -1,7 +1,7 @@
 from typing import List, Dict
 from sqlalchemy.orm import Session
 from models import Country
-from .methods import create_country, delete_country, get_country, get_countries
+from .methods import create_country, delete_country, get_country, get_countries, update_country
 
 
 class CountryController:
@@ -31,4 +31,12 @@ class CountryController:
 
     @staticmethod
     def delete(country_id: int, session: Session) -> Dict:
-        return delete_country(country_id, session)
+        result = delete_country(country_id, session)
+        session.commit()
+        return result
+
+    @staticmethod
+    def update(country_id: int, data: Dict, session: Session) -> Dict:
+        result = update_country(country_id, data, session)
+        session.commit()
+        return result

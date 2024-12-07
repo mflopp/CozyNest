@@ -10,7 +10,6 @@ from .validate_email import validate_email
 from .validate_currency import validate_currency
 from .validate_language import validate_language
 
-
 def validate_data(
     session: Session,
     Model: Type[Any],

@@ -4,7 +4,7 @@ import logging
 from models.addresses import Country
 from controllers.controller_utils import fetch_record
 
-from ...utils import throw_error, set_filter_criteria
+from ...utils import set_filter_criteria
 from ...validations import validate_id, validate_field, validate_value
 
 
@@ -45,15 +45,9 @@ def get_country(field: str, value: any, session: Session) -> Country:
         )
 
         return country
-
+    
     except SQLAlchemyError as e:
-        throw_error(
-            500,
-            f"DB error occurred while querying country by {field}: {e}"
-        )
+        raise SQLAlchemyError ({f"DB error occurred while querying country by {field}: {e}"}, 500)
 
     except Exception as e:
-        throw_error(
-            500,
-            f"Unexpected error while processing the request: {e}"
-        )
+        raise Exception ({f"Unexpected error while processing the request: {e}"}, 500)

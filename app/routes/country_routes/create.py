@@ -2,9 +2,10 @@ from flask import request
 import logging
 
 from controllers import CountryController
-from config import get_session
 from .countries_blueprint import country_bp
-
+from utils import create_response
+from config import session_scope
+from utils.api_error import ValidationError
 
 @country_bp.route("", methods=['POST'])
 def create_country_handler() -> tuple:
@@ -15,18 +16,33 @@ def create_country_handler() -> tuple:
     Returns:
         tuple: A tuple with the response and HTTP status code.
     """
-    session = None
-
     try:
-        session = next(get_session())
+        # Use the session_scope context manager
+        with session_scope() as session:
 
-        country = request.get_json()
-        response, status = CountryController.create(country, session)
-
-        return response, status
+            country_data = request.get_json()
+            country = CountryController.create(country_data, session)
+            if country:
+                return create_response(
+                    data=[("country", country)],
+                    code=200
+                )
+            else:
+                return create_response(
+                    data=[("message", "Country not created")],
+                    code=400
+                )
+                
+    except ValidationError as err:
+        logging.error(f"Error occurred while creating country: {str(err)}")
+        return create_response(
+            data=[("error", str(err))],
+            code=400
+        )
+    
     except Exception as e:
         logging.error(f"Error occurred while creating country data: {str(e)}")
-        return {"error": "Error creating country data"}, 500
-    finally:
-        if session:
-            session.close()
+        return create_response(
+            data=[("error", "Error creating country data")],
+            code=500
+        )

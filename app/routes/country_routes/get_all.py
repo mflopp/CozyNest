@@ -1,44 +1,10 @@
 import logging
-
+from flask import  Response
 from controllers import CountryController
-from config import get_session
 from .countries_blueprint import country_bp
-from flask import make_response, Response
-from collections import OrderedDict
-import json
 
-from contextlib import contextmanager
-
-
-@contextmanager
-def session_scope():
-    """
-    Provides a transactional scope for the database session.
-
-    Yields:
-        session: The database session.
-    """
-    session = next(get_session())
-    try:
-        yield session
-    except Exception:
-        session.rollback()  # Rollback in case of an exception
-        raise
-    finally:
-        session.close()  # Always close the session
-
-
-def create_response(data, code) -> Response:
-    response_data = OrderedDict(data)
-    response_json = json.dumps(
-        response_data,
-        default=str,
-        sort_keys=False
-    )
-    response = make_response(response_json, code)
-    response.headers['Content-Type'] = 'application/json'
-
-    return response
+from utils import create_response
+from config import session_scope
 
 
 @country_bp.route("", methods=['GET'])

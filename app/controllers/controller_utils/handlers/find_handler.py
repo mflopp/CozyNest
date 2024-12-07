@@ -3,8 +3,6 @@ from typing import Any, Optional, Type
 import logging
 
 from sqlalchemy.exc import SQLAlchemyError
-from .error_handler import throw_error
-
 
 def get_first_record_by_criteria(
     session: Session,
@@ -28,6 +26,7 @@ def get_first_record_by_criteria(
     try:
         record = session.query(Model).filter_by(**filter_criteria).first()
         return record
+
     except SQLAlchemyError as e:
         logging.error(
             f"Unexpected database error while querying {Model}: {e}"
@@ -60,23 +59,17 @@ def fetch_record(
     try:
         # Attempt to fetch the record
         record = get_first_record_by_criteria(session, Model, criteria)
-
+        
         if not record:
-            # Log and throw error if no record is found
-            throw_error(
-                code=404,
-                description=f"{model_name} not found with given criteria."
-            )
-
+            return None
         # Log the found record's ID only if found
         logging.info(f"{model_name} found with ID {record.id}")
         return record
-
+ 
     except SQLAlchemyError as e:
         logging.error(
             f"Database error while querying {model_name}: {e}"
         )
-        throw_error(
-            code=500,
-            description=f"Server error while querying {model_name}"
-        )
+        raise
+        # return {"error": f"Database error while querying {model_name}", "details": str(e)}, 500
+        

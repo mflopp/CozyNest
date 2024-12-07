@@ -4,7 +4,7 @@ from models.addresses import Country
 from controllers.controller_utils.validations import validate_data
 from controllers.general_controllers import update_record
 from ...utils import throw_error
-
+from .get_country import get_country
 
 def update_country(country_id: int, data: dict, session: Session) -> Country:
     """
@@ -25,16 +25,12 @@ def update_country(country_id: int, data: dict, session: Session) -> Country:
         # Begin a nested transaction to handle potential rollback
         with session.begin_nested():
             # Fetch the existing country record
-            country = session.query(Country).filter_by(id=country_id).first()
-            if not country:
-                throw_error(
-                    code=404,
-                    description=f"Country with ID {country_id} not found."
-                )
+            country = get_country(field='id', value=country_id, session=session)
 
             # Define fields for validation
-            required_fields = ['name', 'id']
+            required_fields = ['name']
             unique_fields = ['name']
+            print(f"\033[34m ############# BEGINNIG: {country}\033[0m")
 
             # Validate the input data to ensure it meets the model requirements
             validate_data(
@@ -44,33 +40,18 @@ def update_country(country_id: int, data: dict, session: Session) -> Country:
                 required_fields=required_fields,
                 unique_fields=unique_fields
             )
-
-            # Update the fields of the country record
-            for field, value in data.items():
-                if hasattr(country, field):
-                    setattr(country, field, value)
+            print("\033[34m ############# after validation: \033[0m")
 
             # Attempt to update the record
-            result, status_code = update_record(
+            result = update_record(
                 session=session,
                 record=country,
+                new_data=data,
                 entity="Country"
             )
-
-            # Log the successful update with the correct object reference
-            if status_code == 200:
-                logging.info(
-                    f"Country with ID {country.id} successfully updated."
-                )
-                return country
-
-            throw_error(
-                code=500,
-                description=f"Failed to update country with ID {country.id}."
-            )
+            print(f"\033[34m ############# after update: {result}\033[0m")
+        return result
     except Exception as e:
         logging.error(f"Unexpected error during country update: {e}")
-        throw_error(
-            code=500,
-            description="Unexpected error during country update. Check logs for details."
-        )
+        return {"Unexpected error during country update. Check logs for details"}, 500
+

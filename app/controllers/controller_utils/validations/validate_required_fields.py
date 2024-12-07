@@ -39,8 +39,8 @@ def validate_required_fields(
     for field in fields:
         if is_field_missing_or_empty(field, user_data):
             details = {
-                'error': 'Validation failed',
-                'details': f"Field '{field}' is required and cannot be empty.",
+                'title': 'Validation failed',
+                'message': f"Field '{field}' is required and cannot be empty.",
                 'code': 400
             }
             raise ValidationError(details)

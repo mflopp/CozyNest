@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 logging.basicConfig(level=logging.INFO)
 
-def delete_record(session: Session, record, entity: str):
+def update_record(session: Session, record, new_data: dict, entity: str):
     """
     Deletes a record from the database and logs the operation.
 
@@ -22,15 +22,20 @@ def delete_record(session: Session, record, entity: str):
             return {"error": error_message}, 404
         # Attempt to delete the record
         with session.begin_nested():
-            session.delete(record)
+
+            # Update the fields of the country record
+            for field, value in new_data.items():
+                if hasattr(record, field):
+                    setattr(record, field, value)
+                    
             session.flush()
 
-            log_message = f"{record.id} successfully deleted from {entity}"
-            success_message = f"{entity} was deleted."
+            log_message = f"{record.id} successfully updated from {entity}"
+            success_message = f"{entity} was updated."
 
         logging.info(log_message)
         return {"message": success_message, "id": record.id}, 200
     except Exception as e:
-        error_message = f"Failed to delete record from {entity}"
+        error_message = f"Failed to update record from {entity}"
         logging.error(f"{error_message}: {str(e)}")
         raise Exception (f"error: {error_message}, details: {str(e)}")

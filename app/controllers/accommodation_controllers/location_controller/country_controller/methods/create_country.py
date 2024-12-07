@@ -3,7 +3,7 @@ import logging
 from models.addresses import Country
 from controllers.controller_utils.validations import validate_data
 from controllers.general_controllers import add_record
-from ...utils import throw_error
+from utils.api_error import ValidationError
 
 
 def create_country(data: dict, session: Session) -> Country:
@@ -46,6 +46,8 @@ def create_country(data: dict, session: Session) -> Country:
             )
 
         return response, status
+    except ValidationError:
+        raise
     except Exception as e:
-        logging.error(f"Unexpected error during region creation: {e}")
+        logging.error(f"Unexpected error during country creation: {e}")
         raise
