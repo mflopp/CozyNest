@@ -20,6 +20,7 @@ def save_record(session: Session, record: object) -> None:
         with session.begin_nested():
             session.add(record)
             session.flush()
+
         logging.info("Record saved to database session successfully.")
     except SQLAlchemyError as e:
         logging.error(f"Failed to save record: {str(e)}")
@@ -50,4 +51,5 @@ def add_record(session: Session, record, entity: str):
     except SQLAlchemyError as e:
         error_message = f"Failed to create {record} in {entity}"
         logging.error(f'{error_message}: {str(e)}')
-        raise Exception (f"error: {error_message}, details: {str(e)}")
+
+        raise Exception(f"error: {error_message}, details: {str(e)}")
