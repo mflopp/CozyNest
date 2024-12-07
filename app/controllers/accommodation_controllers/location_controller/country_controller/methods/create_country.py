@@ -45,7 +45,7 @@ def create_country(data: dict, session: Session) -> Country:
                 entity="Country"
             )
 
-        return response, status
+        return new_country
     except ValidationError:
         raise
     except Exception as e:
