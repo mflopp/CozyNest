@@ -1,40 +1,40 @@
+import logging
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
-import logging
+from typing import List
 
-from models.addresses import Region
+from controllers.controller_utils import fetch_records
+from models import Region
 
-from ...utils import throw_error
 
-
-def get_regions(session: Session) -> list[str]:
+def get_regions(session: Session) -> List[Region]:
     """
-    Retrieves a list of all regions from the database.
+    Fetches all regions from the database.
 
     Args:
-        session (Session): SQLAlchemy session object.
+        session (Session): The database session.
 
     Returns:
-        list[str]: List of region names.
+        List[Region]: A list of Region objects.
 
     Raises:
-        404 Not Found: If no regions are found in the database.
-        500 Internal Server Error: If database query fails.
+        SQLAlchemyError: If a database error occurs.
     """
     try:
-        # Query all countries
-        regions = session.query(Region).all()
+        # Query all regions
+        regions = fetch_records(session, Region, 'Region')
 
-        # Check if no countries are found
-        if not regions:
-            throw_error(404, "No Regions found in the database.")
+        # Log the number of countries found
+        regions_count = len(regions)
+        if regions_count:
+            logging.info(f"{regions_count} regions found in the database.")
+        else:
+            logging.info("No regions found in the database.")
 
-        # Log number of regions found
-        logging.info(
-            f"{len(regions.id)} regions found in the database."
-        )
         return regions
-    except SQLAlchemyError as e:
-        throw_error(500, f"Database error while fetching regions: {e}")
-    except Exception as e:
-        throw_error(500, f"Unexpected error: {e}")
+    except SQLAlchemyError:
+        logging.error(
+            "Database error occurred while fetching regions.",
+            exc_info=True
+        )
+        raise
