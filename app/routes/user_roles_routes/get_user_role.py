@@ -1,47 +1,50 @@
-from flask import request, make_response
+from flask import request
+from models import UserRole
 import logging
-from controllers.user_controllers import fetch_user_role
-from config import get_session
+from controllers import UserRoleController
 from .user_roles_blueprint import user_roles_bp
-from collections import OrderedDict
-import json
+from utils import create_response
+from config import session_scope
+
 
 @user_roles_bp.route("/getone", methods=['GET'])
-def get_user_role_handler() -> tuple:
+def get_user_role_handler() -> UserRole:
     """
-    Endpoint for retrieving a user setting by ID. Looks up the user in the database
-    and returns the user setting data or a 404 error if not found.
+    Endpoint for retrieving a user role by ID. Looks up the user in the database
+    and returns the user role data or a 404 error if not found.
 
     Args:
-        id (int): The ID of the user setting to retrieve.
+        id (int): The ID of the user role to retrieve.
 
     Returns:
         tuple: A tuple with the response and HTTP status code.
     """
-    db = None
-
     try:
-        db = next(get_session())  # Call get_session() to get a session
-        user_role = request.get_json()
-        user_role = fetch_user_role(user_role, db)
-        
-        if user_role:
-            # Convert UserSettings object to OrderedDict
-            user_role_dict = OrderedDict([
-                ("id", user_role.id),
-                ("role", user_role.role),
-                ("description", user_role.description)
-            ])
+        # Extract role name from query parameters
+        role_name = request.get_json()['role']
+        if not role_name:
+            return create_response(
+                data=[("error", "Role name is required")],
+                code=400
+            )
+        # Use the session_scope context manager
+        with session_scope() as session:
+            user_role = UserRoleController.get_one_by_role(role_name, session)
             
-            response_json = json.dumps(user_role_dict, default=str, sort_keys=False)
-            response = make_response(response_json, 200)
-            response.headers['Content-Type'] = 'application/json'
-            return response
+            if user_role:
+                return create_response(
+                    data=[
+                    ("id", user_role.id),
+                    ("role", user_role.role),
+                    ("description", user_role.description)
+                ],
+                    code=200
+                )
 
-        return {"message": "User setting not found"}, 404
+            return {"message": "User role not found"}, 404
     except Exception as e:
-        logging.error(f"Error occurred while retrieving user setting: {str(e)}")
-        return {"message": "Error finding user setting"}, 500
-    finally:
-        if db:
-            db.close()  # Ensure the database session is properly closed
+        logging.error(f"Error occurred while retrieving user role: {str(e)}")
+        return create_response(
+            data=[("error", f"Error finding user role: {str(e)}")],
+            code=500
+        )
