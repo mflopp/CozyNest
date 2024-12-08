@@ -39,7 +39,7 @@ def create_country(data: dict, session: Session) -> Country:
             new_country = Country(name=data['name'])
 
             # Attempt to add the record
-            response, status = add_record(
+            add_record(
                 session=session,
                 record=new_country,
                 entity="Country"
