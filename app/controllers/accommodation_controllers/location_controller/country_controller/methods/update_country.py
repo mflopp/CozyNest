@@ -3,44 +3,43 @@ import logging
 from models.addresses import Country
 from controllers.controller_utils.validations import validate_data
 from controllers.general_controllers import update_record
-from ...utils import throw_error
 from .get_country import get_country
+
 
 def update_country(country_id: int, data: dict, session: Session) -> Country:
     """
     Updates an existing country record in the database.
 
     Args:
-        country_id (int): ID of the country to update.
-        data (dict): Data for updating the record. Expected key: "name".
+        country_id (int): The ID of the country to update.
+        data (dict): The new data for the country. Must include required
+                     fields.
         session (Session): SQLAlchemy session for database operations.
 
     Returns:
-        Country: The updated country record.
+        Optional[Country]: The updated Country object if successful.
 
     Raises:
-        werkzeug.exceptions.HTTPException: If validation fails or the country is not found.
+        ValueError: If validation fails or the record does not exist.
+        Exception: For unexpected errors during the update process.
     """
     try:
         # Begin a nested transaction to handle potential rollback
         with session.begin_nested():
-            # Fetch the existing country record
-            country = get_country(field='id', value=country_id, session=session)
-
             # Define fields for validation
-            required_fields = ['name']
-            unique_fields = ['name']
-            print(f"\033[34m ############# BEGINNIG: {country}\033[0m")
+            fields = ['name']
 
             # Validate the input data to ensure it meets the model requirements
             validate_data(
                 session=session,
                 Model=Country,
                 data=data,
-                required_fields=required_fields,
-                unique_fields=unique_fields
+                required_fields=fields,
+                unique_fields=fields
             )
-            print("\033[34m ############# after validation: \033[0m")
+
+            # Fetch the existing country record
+            country = get_country('id', country_id, session)
 
             # Attempt to update the record
             result = update_record(
@@ -49,9 +48,14 @@ def update_country(country_id: int, data: dict, session: Session) -> Country:
                 new_data=data,
                 entity="Country"
             )
-            print(f"\033[34m ############# after update: {result}\033[0m")
-        return result
-    except Exception as e:
-        logging.error(f"Unexpected error during country update: {e}")
-        return {"Unexpected error during country update. Check logs for details"}, 500
 
+        logging.info(f"Country with ID {country_id} successfully updated.")
+        return result
+    except ValueError as ve:
+        logging.warning(f"Validation or record error: {ve}")
+        raise
+    except Exception as e:
+        logging.error(
+            f"Unexpected error during country update: {e}", exc_info=True
+        )
+        raise
