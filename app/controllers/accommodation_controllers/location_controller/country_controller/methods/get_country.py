@@ -1,9 +1,12 @@
+import logging
+
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
-import logging
+
 from typing import Any
 
-from models.addresses import Country
+from models import Country
+
 from controllers.controller_utils import fetch_record
 
 from ...utils import set_filter_criteria
@@ -37,7 +40,6 @@ def get_country(field: str, value: Any,
     try:
         # Build filter criteria
         filter_criteria = set_filter_criteria(field, value)
-        logging.debug(f"Filter criteria created: {filter_criteria}")
 
         # Retrieve the record
         country = fetch_record(
@@ -47,14 +49,19 @@ def get_country(field: str, value: Any,
             model_name='Countries'
         )
 
+        logging.info(f"Successfully fetched Country by {field}='{value}'.")
         return country
 
     except SQLAlchemyError as e:
-        raise SQLAlchemyError(
-            {f"DB error occurred while querying country by {field}: {e}"}, 500
+        logging.error(
+            {f"DB error occurred while fetching Country by {field}: {e}"},
+            exc_info=True
         )
+        raise
 
     except Exception as e:
-        raise Exception(
-            {f"Unexpected error while processing the request: {e}"}, 500
+        logging.error(
+            {f"Unexpected error while processing the request: {e}"},
+            exc_info=True
         )
+        raise
