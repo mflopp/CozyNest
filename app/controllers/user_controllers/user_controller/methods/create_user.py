@@ -6,7 +6,7 @@ from models.users import User, Gender
 from controllers.controller_utils.validations import validate_data
 from controllers.user_controllers.user_settings_controller_methods import fetch_user_setting
 from controllers.user_controllers.user_info_controller_methods import add_user_info
-from controllers.user_controllers.user_role_controller_methods import fetch_user_role
+from controllers.user_controllers.user_role_controller.methods import fetch_user_role
 from utils.api_error import ValidationError
 from controllers.controller_utils import get_first_record_by_criteria
 

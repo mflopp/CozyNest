@@ -1,4 +1,4 @@
-from typing import List, Dict, Tuple
+from typing import List, Dict
 from sqlalchemy.orm import Session
 from models import User
 from .methods import add_user, del_user, fetch_users, fetch_user, update_user_data
