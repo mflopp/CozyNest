@@ -1,30 +1,33 @@
+import logging
 from sqlalchemy.orm import Session
-from models.addresses import Region
+from typing import Dict
+
+from models import Region
+
 from controllers.controller_utils.validations import validate_data
 from controllers.general_controllers import add_record
-from country_controller import CountryController
-import logging
-from ...utils import throw_error
+from controllers import CountryController
+from utils.api_error import ValidationError
 
 
-def create_region(data: dict, session: Session) -> Region:
+def create_region(data: Dict, session: Session) -> Region:
     """
-    Create a new region in the database after validating the data
-    and ensuring the country exists.
+    Creates a new region in the database after validating the input data.
 
     Args:
-        data (dict): Input data containing region information.
-        session (Session): Database session for transaction management.
+        data (dict): A dictionary containing region details
+        (e.g., name, country_id).
+        session (Session): SQLAlchemy database session.
 
     Returns:
-        Region: The created region entity.
+        Region: The newly created Region object.
 
     Raises:
-        400 Bad Request: If validation fails.
-        404 Not Found: If the country doesn't exist.
-        500 Internal Server Error: For database-related issues.
+        ValidationError: If the input data is invalid.
+        Exception: For unexpected errors during region creation.
     """
     try:
+        # Begin a nested transaction to handle potential rollback
         with session.begin_nested():
             # Define required and unique fields for validation
             required_fields = ['name', 'country_id']
@@ -51,22 +54,16 @@ def create_region(data: dict, session: Session) -> Region:
             )
 
             # Attempt to add the record
-            result, status_code = add_record(
+            add_record(
                 session=session,
                 record=new_region,
                 entity="Region"
             )
 
-            # Log the successful creation with the correct object reference
-            if status_code == 200:
-                logging.info(
-                    f"Region successfully created with ID: {new_region.id}"
-                )
-                return new_region
-            throw_error(
-                500,
-                f"Failed to create region '{new_region.name}'."
-            )
+            return new_region
+    except ValidationError as e:
+        logging.warning(f"Validation error: {e}")
+        raise
     except Exception as e:
         logging.error(f"Unexpected error during region creation: {e}")
         raise
