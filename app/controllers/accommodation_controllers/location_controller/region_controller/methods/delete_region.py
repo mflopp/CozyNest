@@ -4,42 +4,50 @@ import logging
 from controllers.general_controllers import delete_record
 
 from .get_region import get_region
-from ...utils import throw_error
 
 
 def delete_region(id: int, session: Session):
     """
-    Deletes a Region by its ID from the database.
+    Deletes a region from the database by its ID.
 
     Args:
         id (int): The ID of the region to delete.
-        session (Session): SQLAlchemy session object.
+        session (Session): SQLAlchemy database session.
 
     Returns:
-        dict: Response indicating successful deletion.
+        bool: True if the region was successfully deleted.
 
     Raises:
-        404 Not Found: If the region is not found.
-        500 Internal Server Error: If database operation fails.
+        Exception: If any unexpected error occurs during deletion.
     """
-    # Attempt to fetch the region
-    region = get_region(field='id', value=id, session=session)
+    try:
 
-    # Attempt to delete the record
-    result, status_code = delete_record(
-        session=session,
-        record=region,
-        entity_name="Region"
-    )
+        with session.begin_nested():
+            # Attempt to fetch the country
+            region_to_delete = get_region(
+                field='id',
+                value=id,
+                session=session
+            )
 
-    # Log the successful creation with the correct object reference
-    if status_code == 200:
-        logging.info(
-            f"Region with ID: {region.id} was successfully deleted."
-        )
+            # Attempt to delete the record
+            result = delete_record(
+                session=session,
+                record=region_to_delete,
+                entity="Region"
+            )
 
+        session.flush()
+        logging.info(f"Successfully deleted Region with id={id}.")
         return result
-    throw_error(
-        500,
-        f"Failed to delete region '{region.name}'."
-    )
+
+    except ValueError as ve:
+        logging.error(f"Deletion error: {ve}", exc_info=True)
+        raise
+
+    except Exception as e:
+        logging.error(
+            f"Unexpected error during deleting: {e}",
+            exc_info=True
+        )
+        raise
