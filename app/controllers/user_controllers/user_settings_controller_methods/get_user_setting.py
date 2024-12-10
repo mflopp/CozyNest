@@ -1,25 +1,24 @@
 import logging
 from sqlalchemy.orm import Session
-from models.users import UserSettings
-from controllers.controller_utils import get_first_record_by_criteria
 
-def fetch_user_setting(user_data: dict, session: Session):
-    
+from models import UserSettings
+from utils import Finder, Validator
+
+
+def fetch_user_setting(data: dict, session: Session):
     try:
         # Validate that user_data contains 'currency' and 'language' keys
-        if 'currency' not in user_data or 'language' not in user_data:
-            return False
-        
-        user_setting = get_first_record_by_criteria(
-            session,
-            UserSettings,
-            {"currency": user_data['currency'], "language": user_data['language']}
-        )
-        if user_setting:
-            return user_setting
-        else:
-            return False
+        fields = {'currency', 'language'}
 
+        Validator.validate_required_fields(fields, data)
+
+        user_setting = Finder.fetch_record_by_criteria(
+            session=session,
+            Model=UserSettings,
+            criteria={"currency": data['currency'], "language": data['language']}
+        )
+
+        return user_setting
     except Exception as e:
         session.rollback()
         logging.error(f"Error getting a user setting: {str(e)}")

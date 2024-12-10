@@ -1,21 +1,17 @@
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
+import json
 import logging
 from flask import abort, Response
-import json
+from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
+from typing import Dict
 
-from models.users import Gender
-from controllers.controller_utils import fetch_record
+from models import Gender
+from controllers.controller_utils import Finder
 
 
-def fetch_gender(id: int, session: Session) -> dict:
+def fetch_gender(id: int, session: Session) -> Dict:
     try:
-        gender = fetch_record(
-            session=session,
-            Model=Gender,
-            criteria={'id': id},
-            model_name='Gender'
-        )
+        gender = Finder.fetch_record(session, Gender, 'id', id)
 
         # Use json.dumps to ensure order and return a Response
         response = Response(

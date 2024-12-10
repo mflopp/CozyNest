@@ -26,12 +26,12 @@ def delete_country_handler(id: int) -> Response:
         # Using session_scope context manager for database session
         with session_scope() as session:
             # Call the controller's delete method
-            message, status = CountryController.delete(id, session)
+            CountryController.delete(id, session)
 
             # Return the appropriate response
             return create_response(
-                data=[("info", message)],
-                code=status
+                data=[("info", f'Deleted Succesfully {id}')],
+                code=200
             )
     except Exception as e:
         # Log unexpected errors with traceback

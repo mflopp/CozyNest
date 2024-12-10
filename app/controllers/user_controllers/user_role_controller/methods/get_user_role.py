@@ -4,13 +4,13 @@ from models.users import UserRole
 
 from sqlalchemy.exc import SQLAlchemyError
 from typing import Any
-from controllers.controller_utils import fetch_record
 
-from controllers.accommodation_controllers.location_controller.utils import set_filter_criteria
-from controllers.accommodation_controllers.location_controller.validations import validate_id, validate_field, validate_value
 
-def fetch_user_role(field: str, value: Any,
-                session: Session) -> UserRole:
+def fetch_user_role(
+    field: str,
+    value: Any,
+    session: Session
+) -> UserRole:
 
     valid_fields = {'id', 'name', 'role'}
 

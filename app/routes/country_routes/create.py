@@ -2,10 +2,11 @@ import logging
 from flask import request, Response
 
 from controllers import CountryController
+from utils.error_handler import ValidationError
+
 from .countries_blueprint import country_bp
 from utils import create_response
 from config import session_scope
-from utils.api_error import ValidationError
 
 
 @country_bp.route("", methods=['POST'])

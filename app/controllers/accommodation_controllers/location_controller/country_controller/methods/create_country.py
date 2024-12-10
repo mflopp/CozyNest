@@ -1,53 +1,61 @@
-from sqlalchemy.orm import Session
 import logging
-from models.addresses import Country
-from controllers.controller_utils.validations import validate_data
-from controllers.general_controllers import add_record
-from utils.api_error import ValidationError
+from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
+from typing import Dict
+
+from models import Country
+from utils import Validator, Recorder
+from utils.error_handler import ValidationError
 
 
-def create_country(data: dict, session: Session) -> Country:
-    """
-    Creates a new country record in the database.
-
-    Args:
-        data (dict): Data for creating the record. Expected key: "name".
-        session (Session): SQLAlchemy session for database operations.
-
-    Returns:
-        Country: The newly created country record.
-
-    Raises:
-        ValueError: If validation fails for the provided data.
-    """
+def create_country(data: Dict, session: Session) -> Country:
     try:
         # Begin a nested transaction to handle potential rollback
         with session.begin_nested():
-            # Define required and unique fields for validation
-            required_fields = ['name']
-
             # Validate the input data to ensure it meets the model requirements
-            validate_data(
-                session=session,
-                Model=Country,
-                data=data,
-                required_fields=required_fields,
-                unique_fields=required_fields
-            )
+            field = 'name'
+            Validator.validate_required_field(field, data)
+
+            name = data.get(field)
+
+            Validator.validate_unique_field(session, Country, field, name)
+            Validator.validate_name(name)
+
+            logging.info('All validations succesfully passed!')
 
             # Create a new Country object using the validated data
-            new_country = Country(name=data['name'])
+            new_country = Country(name=name)
+            logging.info('Country object succesfully initialized!')
 
             # Attempt to add the record
-            add_record(
-                session=session,
-                record=new_country,
-                entity="Country"
-            )
+            Recorder.add(session, new_country)
 
         return new_country
-    except ValidationError:
+
+    except ValidationError as e:
+        logging.error(
+            {f"Validation error occurred while creating: {e}"},
+            exc_info=True
+        )
         raise
+
+    except ValueError as e:
+        logging.error(
+            f"Value Error occured while creating: {e}",
+            exc_info=True
+        )
+        raise
+
+    except SQLAlchemyError as e:
+        logging.error(
+            {f"Data Base error occurred while creating: {e}"},
+            exc_info=True
+        )
+        raise
+
     except Exception as e:
-        logging.error(f"Unexpected error during country creation: {e}")
+        logging.error(
+            {f"Unexpected error while creating: {e}"},
+            exc_info=True
+        )
         raise

@@ -1,8 +1,8 @@
 import logging
 from sqlalchemy.orm import Session
-from controllers.general_controllers import add_record
-from models.users import UserInfo
 from sqlalchemy.sql import func
+
+from models import UserInfo
 
 
 def add_user_info(user_data: dict, gender_id: int,

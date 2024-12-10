@@ -1,13 +1,12 @@
 import logging
 from sqlalchemy.orm import Session
-from controllers.general_controllers import add_record
 from models.users import UserSettings
-from controllers.controller_utils.validations import validate_data
 
 from .get_user_setting import fetch_user_setting
 
+
 def add_user_setting(user_data: dict, session: Session):
-    
+
     try:
         # Start a new transaction
         with session.begin_nested():
