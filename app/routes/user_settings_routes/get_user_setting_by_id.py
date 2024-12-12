@@ -1,6 +1,6 @@
 from flask import make_response
 import logging
-from controllers.user_controllers import fetch_user_setting_by_id
+from controllers import UserSettingsController
 from config import get_session
 from .user_settings_blueprint import user_settings_bp
 from collections import OrderedDict
@@ -24,7 +24,7 @@ def get_user_setting_by_id_handler(id: int):
 
     try:
         db = next(get_session())  # Call get_session() to get a session
-        user_setting = fetch_user_setting_by_id(id, db)
+        user_setting = UserSettingsController.get_one_by_id(id, db)
 
         if user_setting:
             # Convert UserSettings object to OrderedDict

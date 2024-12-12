@@ -1,5 +1,5 @@
 import logging
-from controllers.user_controllers import fetch_user_settings
+from controllers import UserSettingsController
 from config import get_session
 from .user_settings_blueprint import user_settings_bp
 from flask import make_response
@@ -20,7 +20,7 @@ def get_user_settings_handler():
 
     try:
         db = next(get_session())  # Call get_session() to get a session
-        user_settings = fetch_user_settings(db)
+        user_settings = UserSettingsController.get_all(db)
 
         if user_settings:
             response_data = OrderedDict([("user settings", user_settings)])

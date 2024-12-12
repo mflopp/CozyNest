@@ -1,17 +1,17 @@
 import logging
 from sqlalchemy.orm import Session
 from .get_user_setting_by_id import fetch_user_setting_by_id
-from .create_user_setting import fetch_user_setting
+
 
 def update_user_setting(id: int, user_data: dict, session: Session):
-    
+
     try:
         with session.begin_nested():
 
             # # Chech if UserSettings update needed
             if 'currency' in user_data or 'language' in user_data:
                 user_setting_current = fetch_user_setting_by_id(id, session)
-                
+
                 if 'currency' not in user_data:
                     user_data['currency'] = user_setting_current.currency
                 if 'language' not in user_data:
@@ -25,5 +25,5 @@ def update_user_setting(id: int, user_data: dict, session: Session):
             else:
                 return False
 
-    except Exception as e:
+    except Exception:
         raise
