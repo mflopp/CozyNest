@@ -15,13 +15,3 @@ class ValidationError(Exception):
         """
         super().__init__(text)
         self.text: str = text
-
-    def __str__(self) -> str:
-        """
-        Custom string representation for the exception.
-
-        Returns:
-            str: The string representation in the format
-                    'ValidationError: text'.
-        """
-        return f"ValidationError: {self.text}"
