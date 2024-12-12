@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String
 from config import Base
 
+from sqlalchemy.orm import relationship
+
 
 class Gender(Base):
     """
@@ -16,6 +18,8 @@ class Gender(Base):
     id = Column(Integer, primary_key=True)
     gender = Column(String, unique=True, nullable=False)
     description = Column(String, nullable=True)
+
+    user_info = relationship("UserInfo", back_populates="gender")
 
     def __repr__(self):
         return (f"<Gender(id={self.id},"
