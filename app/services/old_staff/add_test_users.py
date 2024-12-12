@@ -71,7 +71,7 @@ def test_users_create(session):
             ),
             "jane": create_user(
                 session,
-                roles["owner"], infos["jane"],
+                roles["user"], infos["jane"],
                 "sarah@ma.il", "qweQWE1!", "098-765-4321"
             ),
             "donald": create_user(

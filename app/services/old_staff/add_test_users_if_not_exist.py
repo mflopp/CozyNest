@@ -106,7 +106,7 @@ def test_users_create_if_not_exist() -> None:
             "123-456-7890", "John", "Smith"
         )
         create_user_if_not_exists(
-            "Owner", "sarah@ma.il", "qweQWE1!",
+            "User", "sarah@ma.il", "qweQWE1!",
             "098-765-4321", "Sarah", "Connor"
         )
         create_user_if_not_exists(
