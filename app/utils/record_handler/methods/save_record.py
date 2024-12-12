@@ -5,16 +5,6 @@ from typing import Type, Any
 
 
 def save_record(session: Session, record: Type[Any]) -> None:
-    """
-    Saves a record to the database session and commits the transaction.
-
-    Args:
-        session (Session): The database session to use for the operation.
-        record (object): The record to save.
-
-    Raises:
-        SQLAlchemyError: If an error occurs while saving the record.
-    """
     try:
         with session.begin_nested():
             session.add(record)
