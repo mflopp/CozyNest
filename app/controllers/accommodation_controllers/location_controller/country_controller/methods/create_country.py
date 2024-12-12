@@ -10,24 +10,29 @@ from utils.error_handler import ValidationError
 
 def create_country(data: Dict, session: Session) -> Country:
     try:
-        # Begin a nested transaction to handle potential rollback
         with session.begin_nested():
-            # Validate the input data to ensure it meets the model requirements
             field = 'name'
             Validator.validate_required_field(field, data)
 
             name = data.get(field)
 
-            Validator.validate_unique_field(session, Country, field, name)
-            Validator.validate_name(name)
+            Validator.validate_unique_field(
+                session=session,
+                Model=Country,
+                field=field,
+                value=name
+            )
 
-            logging.info('All validations succesfully passed!')
+            Validator.validate_geografic_name(name)
 
-            # Create a new Country object using the validated data
+            logging.info('Given country name passed all validations!')
+
             new_country = Country(name=name)
+            if not new_country:
+                raise SQLAlchemyError('Country creation error')
+
             logging.info('Country object succesfully initialized!')
 
-            # Attempt to add the record
             Recorder.add(session, new_country)
 
         return new_country
