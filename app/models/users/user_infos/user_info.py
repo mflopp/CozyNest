@@ -63,8 +63,8 @@ class UserInfo(Base):
         onupdate=func.now()
     )
 
-    gender = relationship("Gender")
-    settings = relationship("UserSettings")
+    gender = relationship("Gender", back_populates="user_info")
+    settings = relationship("UserSettings", back_populates="user_info")
 
     def __repr__(self):
         return (
