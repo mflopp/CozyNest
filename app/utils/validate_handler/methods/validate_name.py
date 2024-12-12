@@ -1,20 +1,48 @@
 import re
-from typing import Any
-
+import logging
 from utils import ValidationError
-from .validate_requirements import validate_requirements
+
+CONDITIONS = [
+    {
+        "pattern": r"^[A-Z]",
+        "error": "The name must start with an uppercase letter."
+    },
+    {
+        "pattern": r"^.{3,}",
+        "error": "The name must be longer than 2 characters."
+    },
+    {
+        "pattern": r"^.{1,30}$",
+        "error": "The name must be less than 30 characters."
+    },
+    {
+        "pattern": r"^[A-Za-z]+(\s[A-Z][a-z]+)*$",
+        "error": "The name may contain only letters and spaces, but each word must start with an uppercase letter."
+    },
+    {
+        "pattern": r"^([A-Z][a-z]*\s){0,2}[A-Z][a-z]*$",
+        "error": "The name may contain at most three words separated by single spaces."
+    },
+    {
+        "pattern": r"^[A-Za-z\s]+$",
+        "error": "The name may only include letters and spaces."
+    }
+]
 
 
-def is_valid_name(name: str):
-    # Regular expression to validate the name
-    pattern = re.compile(r"^[A-Z][a-z]{1,24}(-[a-z]+)?(\s[A-Z][a-z]{2,25})?$")
-
-    return bool(pattern.match(name))
-
-
-def validate_name(name: str | Any | None) -> None:
+def validate_geografic_name(name: str) -> None:
+    logging.info('Validation of geografic name started!')
     try:
-        message = 'Name does not fit the requirements'
-        validate_requirements(name, is_valid_name, message)
+        if not name:
+            raise ValidationError('Name cannot be empty')
+
+        error_template = f"Name '{name}' doesn't meet the required format: "
+
+        for condition in CONDITIONS:
+            if not re.match(condition['pattern'], name):
+                error = condition['error']
+                raise ValidationError(f'{error_template}{error}')
+
+        logging.info('Validation of geografic name finished!')
     except ValidationError:
         raise
