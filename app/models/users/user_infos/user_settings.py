@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String
 from config import Base
 
+from sqlalchemy.orm import relationship
+
 
 class UserSettings(Base):
     """
@@ -16,6 +18,8 @@ class UserSettings(Base):
     id = Column(Integer, primary_key=True)
     currency = Column(String, default='USD', nullable=False)
     language = Column(String, default='ENG', nullable=False)
+
+    user_info = relationship("UserInfo", back_populates="settings")
 
     def __repr__(self):
         return (f"<UserSettings(id={self.id},"
