@@ -36,8 +36,5 @@ def validate_unique_field(
             # Log successful validation when no duplicate is found
             logging.info("No duplicate found.")
 
-    except Exception as e:
-        # Log any exception that occurs during the database query
-        # or validation process
-        logging.error(f"An error occurred during uniqueness validation: {e}")
+    except ValidationError:
         raise

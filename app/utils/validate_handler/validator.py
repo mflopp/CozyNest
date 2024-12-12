@@ -11,6 +11,7 @@ from .methods import (
     validate_required_field,
     validate_unique_field,
     validate_unique_fields,
+    validate_geografic_name,
     validate_name,
     validate_id
 )
@@ -23,6 +24,10 @@ class Validator:
     @staticmethod
     def validate_id(id: int) -> None:
         validate_id(id)
+
+    @staticmethod
+    def validate_geografic_name(name: str) -> None:
+        validate_geografic_name(name)
 
     @staticmethod
     def validate_name(name: str | Any | None) -> None:
