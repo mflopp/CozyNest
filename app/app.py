@@ -5,6 +5,9 @@ from config import init_db, config_data
 from routes import register_all_blueprints
 from utils import setup_logger
 
+# from services.old_staff.create_user_test import try_to_test
+# from config import init_tables
+
 
 # -- start app function
 def start_app():
