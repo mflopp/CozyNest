@@ -7,7 +7,9 @@ from .methods import (
     set_filter_criteria,
     get_first_record_by_criteria,
     log_found_amount,
-    get_full_record
+    get_full_record,
+    fetch_combination_record,
+    fetch_relevant_values
 )
 
 
@@ -43,8 +45,20 @@ class Finder:
         return fetch_record(session, Model, field, value)
 
     @staticmethod
+    def fetch_combination_record(
+        session: Session,
+        Model: Type[Any],
+        criteria: Dict[str, Any]
+    ) -> Any:
+        return fetch_combination_record(session, Model, criteria)
+
+    @staticmethod
     def log_found_amount(records: List[Any]) -> None:
         return log_found_amount(records)
+
+    @staticmethod
+    def fetch_relevant_values(fields: List, data: Dict) -> Dict:
+        return fetch_relevant_values(fields, data)
 
     @staticmethod
     def get_associated(

@@ -11,6 +11,9 @@ def get_first_record_by_criteria(
     criteria: Dict[str, Any]
 ) -> Optional[Any]:
     try:
+        # Get the name of the model for logging purposes
+        model_name = Model.__name__
+
         record = session.query(Model).filter_by(**criteria).first()
         if not record:
             logging.warning(f'Record not found: {criteria}')
@@ -18,6 +21,6 @@ def get_first_record_by_criteria(
 
     except SQLAlchemyError as e:
         logging.error(
-            f"Unexpected database error while querying {Model}: {e}"
+            f"Unexpected database error while querying {model_name}: {e}"
         )
         return None

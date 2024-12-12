@@ -1,7 +1,9 @@
+import logging
 from sqlalchemy.orm import Session
 from typing import Type, Dict, List, Any
 
-from .validate_unique_field import validate_unique_field
+from utils import Finder
+from utils.error_handler import ValidationError
 
 
 def validate_unique_fields(
@@ -28,13 +30,38 @@ def validate_unique_fields(
     if not fields:
         raise ValueError("The fields list cannot be empty.")
 
+    # maybe this block must be deleted
     for field in fields:
         if field not in fields_values:
             raise ValueError(f"Field '{field}' is missing in fields_values.")
-        try:
-            validate_unique_field(session, Model, field, fields_values[field])
-        except Exception as e:
-            data = f"'{fields_values[field]}': {e}"
-            raise ValueError(
-                f"Validation failed for field '{field}' with value '{data}"
+
+    try:
+
+        # Fetch any existing record with the same combination of field values
+        record = Finder.fetch_combination_record(
+            session=session,
+            Model=Model,
+            criteria=fields_values
+        )
+
+        # Log if a duplicate is found
+        if record:
+            msg = f"Duplicate record found with values: {fields_values}."
+            # logging.warning(msg)
+            raise ValidationError(msg)
+        else:
+            # Log successful validation when no duplicate is found
+            logging.info(
+                "No duplicate record found with the given combination "
+                f"of values {fields_values}"
             )
+    except ValidationError:
+        raise
+
+    except Exception as e:
+        # Log any exception that occurs during the database query
+        # or validation process
+        # logging.error(f"An error occurred during uniqueness validation: {e}")
+        raise Exception(
+            f"An error occurred during unique validation of '{fields}': {e}"
+        )

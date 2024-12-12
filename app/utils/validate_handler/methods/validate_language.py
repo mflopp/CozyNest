@@ -32,4 +32,4 @@ def validate_language(language: str) -> None:
     Raises:
         ValidationError: If the language is invalid.
     """
-    validate_requirements(language, is_valid_language)
+    validate_requirements(language, is_valid_language, ["XXX"])

@@ -13,4 +13,4 @@ def is_valid_currency(currency: str) -> bool:
 
 
 def validate_currency(currency: str) -> None:
-    validate_requirements(currency, is_valid_currency)
+    validate_requirements(currency, is_valid_currency, ["XXX"])
