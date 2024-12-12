@@ -1,5 +1,6 @@
 import logging
 from flask import request, Response
+from sqlalchemy.exc import SQLAlchemyError
 
 from controllers import CountryController
 from utils.error_handler import ValidationError
@@ -11,15 +12,6 @@ from config import session_scope
 
 @country_bp.route("", methods=['POST'])
 def create_country_handler() -> Response:
-    """
-    Handle POST request to create a new country.
-
-    Returns:
-        Response: JSON response containing the created country or
-        an error message.
-    Raises:
-        Logs any unexpected exceptions and returns appropriate error responses.
-    """
     try:
         # Using session_scope context manager for database session
         with session_scope() as session:
@@ -41,13 +33,34 @@ def create_country_handler() -> Response:
                 code=400
             )
 
-    except ValidationError as err:
+    except ValidationError as e:
         # Logging validation error
-        logging.error(f"Error occurred while creating country: {str(err)}")
+        logging.error(f"Error occurred while creating country: {str(e)}")
 
         # Returning validation error response
         return create_response(
-            data=[("error", str(err))],
+            data=[("error", str(e))],
+            code=400
+        )
+
+    except ValueError as e:
+        logging.error(
+            f"Value Error occured while creating: {str(e)}",
+            exc_info=True
+        )
+        # Returning validation error response
+        return create_response(
+            data=[("error", str(e))],
+            code=400
+        )
+
+    except SQLAlchemyError as e:
+        logging.error(
+            {f"Data Base error occurred while creating: {e}"},
+            exc_info=True
+        )
+        return create_response(
+            data=[("error", str(e))],
             code=400
         )
 
