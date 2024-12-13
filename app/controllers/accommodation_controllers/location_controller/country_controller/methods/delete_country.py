@@ -19,7 +19,7 @@ def delete_country(id: int, session: Session):
 
         with session.begin_nested():
             # Attempt to fetch the country
-            country = get_country(field='id', value=id, session=session)
+            country = get_country(id, session)
             if not country:
                 logging.info('No country to delete')
                 raise NoRecordsFound
@@ -28,6 +28,10 @@ def delete_country(id: int, session: Session):
                 raise HasChildError
 
             Recorder.delete(session, country)
+
+    except HasChildError as e:
+        logging.error(e, exc_info=True)
+        raise
 
     except NoRecordsFound as e:
         logging.error(
