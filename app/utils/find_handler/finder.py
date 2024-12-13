@@ -18,7 +18,11 @@ class Finder:
         return set_filter_criteria(field, value)
 
     @staticmethod
-    def fetch_record(session: Session, Model: Type[Any], criteria: Dict[str, Any]) -> Any:
+    def fetch_record(
+        session: Session,
+        Model: Type[Any],
+        criteria: Dict[str, Any]
+    ) -> Any:
         return fetch_one(session, Model, criteria)
 
     @staticmethod
