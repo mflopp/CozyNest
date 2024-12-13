@@ -55,11 +55,14 @@ def update_user_data(id: int, user_data: dict, session: Session):
 
             # Fetch and update UserInfo (replace to functions from userInfo models)
             update_user_info(user_info.id, user_data, gender_id, user_setting_id, session)
-               
 
         # Commit the changes
         session.flush()
         logging.info(f"User with ID {id} updated successfully")
         return {f"User with ID {id} updated successfully"}
+
+    except ValueError:
+        raise
+
     except (ValueError, Exception) as e:
         raise
