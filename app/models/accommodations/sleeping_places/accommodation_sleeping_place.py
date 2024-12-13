@@ -47,8 +47,12 @@ class AccommodationSleepingPlace(Base):
         nullable=False
     )
 
-    sleeping_place = relationship("SleepingPlace")
-    accommodation = relationship("Accommodation")
+    sleeping_place = relationship(
+        "SleepingPlace", back_populates='accommodation_sleeping_place'
+    )
+    accommodation = relationship(
+        "Accommodation", back_populates='accommodation_sleeping_place'
+    )
 
     def __repr__(self):
         return (f"<AccommodationSleepingPlace(id={self.id}, "
