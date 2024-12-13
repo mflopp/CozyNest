@@ -12,7 +12,7 @@ def validate_unique_fields(
     fields_values: Dict[str, Any]
 ) -> None:
     try:
-        record = Finder.fetch_combination_record(
+        record = Finder.fetch_record(
             session=session,
             Model=Model,
             criteria=fields_values
