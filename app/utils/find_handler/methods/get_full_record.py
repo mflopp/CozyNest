@@ -23,18 +23,6 @@ def get_full_record(
     id: int,
     Model: Type[Any]
 ) -> Optional[Dict[str, Any]]:
-    """
-    Dynamically fetch a record with all relationships from a given base model.
-
-    Args:
-        session (Session): SQLAlchemy session.
-        id (int): Primary key ID to filter the query.
-        Model (Type): The SQLAlchemy model representing the primary table.
-
-    Returns:
-        Optional[Dict[str, Any]]: Returns a dictionary of all fields
-        from joined relationships or None.
-    """
     try:
         # Dynamically load relationships for a given model
         query = session.query(Model)
