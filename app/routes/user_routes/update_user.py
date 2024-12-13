@@ -1,7 +1,9 @@
 from flask import request
 import logging
+
 from controllers import UserController
 from .users_blueprint import users_bp
+
 from utils import create_response
 from config import session_scope
 

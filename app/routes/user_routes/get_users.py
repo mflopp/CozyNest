@@ -20,7 +20,7 @@ def get_users_handler() -> list:
         # Use the session_scope context manager
         with session_scope() as session:
             users = UserController.get_all(session)
-            
+
             if users:
                 return create_response(
                     data=[("users", users)],
@@ -28,10 +28,10 @@ def get_users_handler() -> list:
                 )
 
             return "Users not found", 404
+
     except Exception as e:
         logging.error(f"Error occurred while retrieving users: {str(e)}")
         return create_response(
             data=[("error", f"Error finding users: {str(e)}")],
             code=500
         )
-

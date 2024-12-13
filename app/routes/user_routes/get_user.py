@@ -23,7 +23,7 @@ def get_user_handler(id: int) -> tuple:
     try:
         # Use the session_scope context manager
         with session_scope() as session:
-            
+
             user = UserController.get_one(id, session)
             if user:
                 return create_response(data=[
@@ -50,6 +50,7 @@ def get_user_handler(id: int) -> tuple:
                 )
 
             return {"error": f"User ID {id} not found"}, 404
+
     except Exception as e:
         logging.error(f"Error occurred while retrieving user {id}: {str(e)}")
         return create_response(

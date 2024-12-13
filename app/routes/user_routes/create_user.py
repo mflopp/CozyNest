@@ -1,10 +1,13 @@
 from flask import request
 import logging
+
 from controllers import UserController
-from utils.api_error import ValidationError
+from utils.error_handler import ValidationError
 from .users_blueprint import users_bp
+
 from utils import create_response
 from config import session_scope
+
 
 @users_bp.route("", methods=['POST'])
 def create_user_handler() -> tuple:
@@ -33,18 +36,17 @@ def create_user_handler() -> tuple:
                     ],
                 code=200
             )
-                
+
     except ValidationError as err:
         logging.error(f"Error occurred while creating country: {str(err)}")
         return create_response(
             data=[("error", str(err))],
             code=400
         )
-        
+
     except Exception as e:
         logging.error(f"Error occurred while creating user: {str(e)}")
         return create_response(
             data=[("error", f"Error creating user: {str(e)}")],
             code=500
         )
-
