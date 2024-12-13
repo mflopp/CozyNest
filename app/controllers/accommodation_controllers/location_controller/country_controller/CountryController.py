@@ -19,16 +19,10 @@ class CountryController:
         return country
 
     @staticmethod
-    def get_one_by_id(country_id: int, session: Session) -> Country:
-        contry = get_country('id', country_id, session)
+    def get_country(country_id: int, session: Session) -> Country:
+        contry = get_country(country_id, session)
         session.commit()
         return contry
-
-    # @staticmethod
-    # def get_one_by_name(country_name: str, session: Session) -> Country:
-    #     country = get_country('name', country_name, session)
-    #     session.commit()
-    #     return country
 
     @staticmethod
     def get_all(session: Session) -> List:
