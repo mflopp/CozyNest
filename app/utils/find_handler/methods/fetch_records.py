@@ -1,23 +1,23 @@
 import logging
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
-from typing import Optional, Type, List, Any
+from typing import Optional, Type, List, Any, Dict
 
 
 def fetch_records(
     session: Session,
     Model: Type[Any],
-    filter_conditions: Optional[Any] = None,
+    criteria: Dict[str, Any] = {},
     order_by: Optional[Any] = None
 ) -> List[Any]:
     try:
+        logging.info('')
         model_name = Model.__name__
         # Build the query
         query = session.query(Model)
 
-        if filter_conditions:
-            for condition in filter_conditions:
-                query = query.filter(condition)
+        if criteria:
+            query = query.filter(**criteria)
 
         if order_by:
             query = query.order_by(order_by)
@@ -26,7 +26,7 @@ def fetch_records(
         records = query.all()
 
         if not records:
-            logging.warning(f"No {model_name} records found.")
+            logging.info(f"No {model_name} records found.")
             return []
 
         logging.info(f"{len(records)} {model_name} records found.")
