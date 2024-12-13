@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
-from config import Base
 from sqlalchemy.orm import relationship
+from config import Base
 
 
 class Amenity(Base):
