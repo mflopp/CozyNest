@@ -5,6 +5,7 @@ from .users_blueprint import users_bp
 from utils import create_response
 from config import session_scope
 
+
 @users_bp.route("/<int:id>", methods=['PUT'])
 def update_user_handler(id: int) -> tuple:
     """
@@ -26,6 +27,12 @@ def update_user_handler(id: int) -> tuple:
                 data=[("user", response)],
                 code=200
             )
+
+    except ValueError as value_error:
+        return create_response(
+            data=[("error", str(value_error))],
+            code=500
+        )
 
     except Exception as e:
         logging.error(f"Error occurred while updating user ID {id}: {str(e)}")
