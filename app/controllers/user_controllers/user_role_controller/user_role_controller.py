@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from models import UserRole
 from .methods import fetch_user_roles, fetch_user_role
 
+
 class UserRoleController:
     @staticmethod
     def get_all(session: Session) -> List:

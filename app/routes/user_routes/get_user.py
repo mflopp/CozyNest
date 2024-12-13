@@ -1,9 +1,12 @@
 import logging
+
 from controllers import UserController
 from .users_blueprint import users_bp
 from collections import OrderedDict
+
 from utils import create_response
 from config import session_scope
+
 
 @users_bp.route("<int:id>", methods=['GET'])
 def get_user_handler(id: int) -> tuple:
@@ -23,14 +26,15 @@ def get_user_handler(id: int) -> tuple:
             
             user = UserController.get_one(id, session)
             if user:
-                return create_response(
-                    data=[
+                return create_response(data=[
                     ("user_id", user.user_id),
                     ("email", user.email),
-                    ("password", user.password),  # Consider excluding sensitive data
+                    # Consider excluding sensitive data (password)
+                    ("password", user.password),
                     ("first_name", user.first_name),
                     ("last_name", user.last_name),
-                    ("birthdate", user.birthdate.strftime("%d.%m.%Y") if user.birthdate else None),
+                    ("birthdate", user.birthdate.strftime("%d.%m.%Y")
+                     if user.birthdate else None),
                     ("gender", user.gender),
                     ("phone", user.phone),
                     ("role", user.user_role),
@@ -52,4 +56,3 @@ def get_user_handler(id: int) -> tuple:
             data=[("error", f"Error finding user: {str(e)}")],
             code=500
         )
-

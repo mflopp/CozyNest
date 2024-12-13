@@ -16,7 +16,7 @@ def add_user_setting(user_data: Dict, session: Session) -> UserSettings:
 
             # ISO 639-3 language codes are used
             fields = ['currency', 'language']
-            relevant_values = Finder.fetch_relevant_values(fields, user_data)
+            relevant_values = Finder.extract_required_data(fields, user_data)
 
             Validator.validate_required_fields(fields, relevant_values)
 
@@ -25,7 +25,7 @@ def add_user_setting(user_data: Dict, session: Session) -> UserSettings:
 
             Validator.validate_unique_fields(
                 session, UserSettings,
-                fields, relevant_values
+                relevant_values
             )
 
             Validator.validate_currency(currency)

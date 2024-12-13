@@ -11,7 +11,7 @@ def fetch_user_setting(data: Dict, session: Session):
         # ISO 639-3 language codes are used
         fields = ['currency', 'language']
         # getting only fiels from the user request data
-        relevant_values = Finder.fetch_relevant_values(fields, data)
+        relevant_values = Finder.extract_required_data(fields, data)
 
         # Validate that data contains 'currency' and 'language' keys
         Validator.validate_required_fields(fields, relevant_values)
@@ -28,12 +28,13 @@ def fetch_user_setting(data: Dict, session: Session):
         )
 
         # Retrieve the record from the DB
-        user_setting = Finder.fetch_combination_record(
+        user_setting = Finder.fetch_record(
             session=session,
             Model=UserSettings,
             criteria={"currency": currency, "language": language}
         )
 
         return user_setting
+
     except Exception:
         raise

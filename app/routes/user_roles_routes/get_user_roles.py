@@ -1,9 +1,12 @@
 import logging
-from controllers import UserRoleController
 from typing import List
+
+from controllers import UserRoleController
 from .user_roles_blueprint import user_roles_bp
+
 from utils import create_response
 from config import session_scope
+
 
 @user_roles_bp.route("", methods=['GET'])
 def get_user_roles_handler() -> List:
