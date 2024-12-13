@@ -41,5 +41,5 @@ class UserSettingsController:
     @staticmethod
     def update(user_id: int, data: Dict, session: Session) -> List:
         result = update_user_setting(user_id, data, session)
-        session.commit()
+        # session.commit()
         return result
