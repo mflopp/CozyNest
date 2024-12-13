@@ -1,14 +1,13 @@
 from sqlalchemy.orm import Session
 from typing import Any, Dict, Type, List, Optional
 
+
 from .methods import (
-    fetch_record,
+    fetch_one,
     fetch_records,
     set_filter_criteria,
-    get_first_record_by_criteria,
     log_found_amount,
     get_full_record,
-    fetch_combination_record,
     fetch_relevant_values
 )
 
@@ -19,12 +18,8 @@ class Finder:
         return set_filter_criteria(field, value)
 
     @staticmethod
-    def fetch_record_by_criteria(
-        session: Session,
-        Model: Type[Any],
-        criteria: Dict[str, Any]
-    ) -> Any:
-        return get_first_record_by_criteria(session, Model, criteria)
+    def fetch_record(session: Session, Model: Type[Any], criteria: Dict[str, Any]) -> Any:
+        return fetch_one(session, Model, criteria)
 
     @staticmethod
     def fetch_records(
@@ -34,23 +29,6 @@ class Finder:
         order_by: Optional[Any] = None
     ) -> List:
         return fetch_records(session, Model, filter_conditions, order_by)
-
-    @staticmethod
-    def fetch_record(
-        session: Session,
-        Model: Type[Any],
-        field: str,
-        value: Any
-    ) -> Any:
-        return fetch_record(session, Model, field, value)
-
-    @staticmethod
-    def fetch_combination_record(
-        session: Session,
-        Model: Type[Any],
-        criteria: Dict[str, Any]
-    ) -> Any:
-        return fetch_combination_record(session, Model, criteria)
 
     @staticmethod
     def log_found_amount(records: List[Any]) -> None:
