@@ -1,16 +1,18 @@
 import logging
 from flask import request
 from sqlalchemy.exc import SQLAlchemyError
+from typing import Dict
 
 from utils.error_handler import ValidationError
 from controllers import UserSettingsController
 from .user_settings_blueprint import user_settings_bp
+
 from utils import create_response
 from config import session_scope
 
 
 @user_settings_bp.route("", methods=['POST'])
-def create_user_setting_handler() -> tuple:
+def create_user_setting_handler() -> Dict:
     """
     Endpoint for creating a new user setting. Receives user
     data as JSON and returns
@@ -23,9 +25,9 @@ def create_user_setting_handler() -> tuple:
         # Use the session_scope context manager
         with session_scope() as session:
 
-            user_settings = request.get_json()
+            user_setting_data = request.get_json()
             user_setting = UserSettingsController.create(
-                user_settings,
+                user_setting_data,
                 session
             )
             return create_response(
@@ -37,35 +39,35 @@ def create_user_setting_handler() -> tuple:
                 code=200
             )
 
-    except ValidationError as val_error:
+    except ValidationError as e:
         # Logging validation error
         logging.error(
-            f"Validation error while creating a user setting: {str(val_error)}"
+            f"Validation error while creating a user setting: {str(e)}"
         )
 
         # Returning validation error response
         return create_response(
-            data=[("error", str(val_error))],
+            data=[("error", str(e))],
             code=400
         )
 
-    except ValueError as value_err:
+    except ValueError as e:
         logging.error(
-            f"Value Error occured while creating a user setting: {value_err}",
+            f"Value Error occured while creating a user setting: {e}",
             exc_info=True
         )
         return create_response(
-            data=[("error", str(value_err))],
+            data=[("error", str(e))],
             code=400
         )
 
-    except SQLAlchemyError as err:
+    except SQLAlchemyError as e:
         logging.error(
-            {f"Data Base error occurred while creating a user setting: {err}"},
+            {f"Data Base error occurred while creating a user setting: {e}"},
             exc_info=True
         )
         return create_response(
-            data=[("error", str(err))],
+            data=[("error", str(e))],
             code=400
         )
 
