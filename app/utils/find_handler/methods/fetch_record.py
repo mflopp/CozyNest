@@ -11,13 +11,14 @@ def fetch_one(
     criteria: Dict[str, Any]
 ) -> Any:
     try:
+        logging.info("Record fetching started...")
         # Get the name of the model for logging purposes
         model_name = Model.__name__
 
         record = session.query(Model).filter_by(**criteria).first()
 
         if not record:
-            logging.warning(f'No {model_name} record found where: {criteria}')
+            logging.info(f'No {model_name} record found where: {criteria}')
             return None
 
         # Log the ID of the fetched record if it exists
