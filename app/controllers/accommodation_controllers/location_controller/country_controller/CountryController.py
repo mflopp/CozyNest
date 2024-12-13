@@ -24,11 +24,11 @@ class CountryController:
         session.commit()
         return contry
 
-    @staticmethod
-    def get_one_by_name(country_name: str, session: Session) -> Country:
-        country = get_country('name', country_name, session)
-        session.commit()
-        return country
+    # @staticmethod
+    # def get_one_by_name(country_name: str, session: Session) -> Country:
+    #     country = get_country('name', country_name, session)
+    #     session.commit()
+    #     return country
 
     @staticmethod
     def get_all(session: Session) -> List:
