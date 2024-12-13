@@ -1,9 +1,10 @@
-import logging
 from sqlalchemy.orm import Session
-from models.users import UserRole
-
 from sqlalchemy.exc import SQLAlchemyError
 from typing import Any
+
+from utils import Finder, Validator
+from models.users import UserRole
+from utils.error_handler import ValidationError
 
 
 def fetch_user_role(
@@ -12,33 +13,32 @@ def fetch_user_role(
     session: Session
 ) -> UserRole:
 
-    valid_fields = {'id', 'name', 'role'}  # name?????
-
-    validate_field(field, valid_fields)
-    validate_value(value, field)
-    validate_id(value, field)
-
     try:
-        # Build filter criteria
-        filter_criteria = set_filter_criteria(field, value)
-        logging.debug(f"Filter criteria created: {filter_criteria}")
+        # if field == id create filter for the DB request
+        if field == "id":
+            filter_criteria = {field: value}
+        else:
+            # else check if 'role' parameter exists in user request
+            Validator.validate_required_field(field, value)
+            filter_criteria = Finder.extract_required_data([field], value)
 
-        # Retrieve the record
-        user_role = fetch_record(
+        # Fetch the user role record
+        user_role = Finder.fetch_record(
             session=session,
             Model=UserRole,
-            criteria=filter_criteria,
-            model_name='user role'
+            criteria=filter_criteria
         )
 
         return user_role
 
     except SQLAlchemyError as e:
         raise SQLAlchemyError(
-            {f"DB error occurred while querying country by {field}: {e}"}, 500
+            {f"DB error occurred while querying user role by {field}: {e}"},
+            500
         )
 
-    except Exception as e:
-        raise Exception(
-            {f"Unexpected error while getting a user role: {e}"}, 500
-        )
+    except ValidationError:
+        raise
+
+    except Exception:
+        raise

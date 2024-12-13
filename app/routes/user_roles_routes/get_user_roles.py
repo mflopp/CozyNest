@@ -1,5 +1,6 @@
 import logging
 from typing import List
+from sqlalchemy.exc import SQLAlchemyError
 
 from controllers import UserRoleController
 from .user_roles_blueprint import user_roles_bp
@@ -29,6 +30,16 @@ def get_user_roles_handler() -> List:
                 )
 
             return "User roles not found", 404
+
+    except SQLAlchemyError as e:
+        return create_response(
+            data=[(
+                "error",
+                f"DB error occured while fetching user roles: {str(e)}"
+            )],
+            code=500
+        )
+
     except Exception as e:
         logging.error(f"Error occurred while retrieving user roles: {str(e)}")
         return create_response(
