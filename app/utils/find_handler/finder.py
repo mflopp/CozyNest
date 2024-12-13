@@ -8,7 +8,7 @@ from .methods import (
     set_filter_criteria,
     log_found_amount,
     get_full_record,
-    fetch_relevant_values
+    extract_required_data
 )
 
 
@@ -39,8 +39,8 @@ class Finder:
         return log_found_amount(records)
 
     @staticmethod
-    def fetch_relevant_values(fields: List, data: Dict) -> Dict:
-        return fetch_relevant_values(fields, data)
+    def extract_required_data(fields: List, data: Dict) -> Dict:
+        return extract_required_data(fields, data)
 
     @staticmethod
     def get_associated(
