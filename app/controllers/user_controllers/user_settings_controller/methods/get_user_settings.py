@@ -9,10 +9,7 @@ def fetch_user_settings(session: Session):
     try:
         user_settings = Finder.fetch_records(session, UserSettings)
 
-        if user_settings:
-            return user_settings
-        else:
-            return False
+        return user_settings
 
     except Exception:
         raise

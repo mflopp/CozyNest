@@ -8,17 +8,14 @@ class UserRoleController:
     @staticmethod
     def get_all(session: Session) -> List:
         user = fetch_user_roles(session)
-        session.commit()
         return user
 
     @staticmethod
     def get_one_by_id(role_id: int, session: Session) -> UserRole:
         contry = fetch_user_role('id', role_id, session)
-        session.commit()
         return contry
 
     @staticmethod
     def get_one_by_role(role_name: str, session: Session) -> UserRole:
         country = fetch_user_role('role', role_name, session)
-        session.commit()
         return country

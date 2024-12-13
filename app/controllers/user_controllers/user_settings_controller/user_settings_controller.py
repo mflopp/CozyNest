@@ -17,19 +17,16 @@ class UserSettingsController:
     @staticmethod
     def get_one_by_name(data: Dict, session: Session) -> UserSettings:
         user_setting = fetch_user_setting(data, session)
-        session.commit()
         return user_setting
 
     @staticmethod
     def get_one_by_id(user_setting_id: int, session: Session) -> UserSettings:
         user_setting = fetch_user_setting_by_id(user_setting_id, session)
-        session.commit()
         return user_setting
 
     @staticmethod
     def get_all(session: Session) -> List:
         user_settings = fetch_user_settings(session)
-        session.commit()
         return user_settings
 
     @staticmethod
@@ -41,5 +38,5 @@ class UserSettingsController:
     @staticmethod
     def update(user_id: int, data: Dict, session: Session) -> List:
         result = update_user_setting(user_id, data, session)
-        # session.commit()
+        session.commit()
         return result

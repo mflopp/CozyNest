@@ -12,7 +12,7 @@ def fetch_user_role(
     session: Session
 ) -> UserRole:
 
-    valid_fields = {'id', 'name', 'role'}
+    valid_fields = {'id', 'name', 'role'}  # name?????
 
     validate_field(field, valid_fields)
     validate_value(value, field)
