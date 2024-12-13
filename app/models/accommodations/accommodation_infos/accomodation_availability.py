@@ -20,7 +20,7 @@ class AccommodationAvailability(Base):
     time_checkout = Column(String, nullable=False)
 
     accommodation = relationship(
-        "Accommodation", back_populates='accommodation_availabilities'
+        "Accommodation", back_populates='accommodation_availability'
     )
 
     def __repr__(self):

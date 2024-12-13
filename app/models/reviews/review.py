@@ -52,8 +52,8 @@ class Review(Base):
     comment = Column(String(255))
     created_at = Column(TIMESTAMP, server_default=func.now())
 
-    accommodation = relationship("Accommodation")
-    guest = relationship("User")
+    accommodation = relationship("Accommodation", back_populates="review")
+    user = relationship("User", back_populates="review")
 
     def __repr__(self):
         return (f"<Review(id={self.id},"

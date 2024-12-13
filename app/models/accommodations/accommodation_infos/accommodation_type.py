@@ -15,7 +15,7 @@ class AccommodationType(Base):
     )
 
     accommodation = relationship(
-        "Accommodation", back_populates='accommodation_types'
+        "Accommodation", back_populates='accommodation_type'
     )
 
     def __repr__(self) -> str:

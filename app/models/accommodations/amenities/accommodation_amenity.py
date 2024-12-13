@@ -19,8 +19,12 @@ class AccommodationAmenity(Base):
         nullable=False
     )
 
-    accommodation = relationship("Accommodation")
-    amenity = relationship("Amenity")
+    amenity = relationship(
+        "Amenity", back_populates='accommodation_amenity'
+    )
+    accommodation = relationship(
+        "Accommodation", back_populates='accommodation_amenity'
+    )
 
     def __repr__(self) -> str:
         return (f"<AccommodationAmenity(id={self.id}, "

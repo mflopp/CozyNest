@@ -10,8 +10,8 @@ class Region(Base):
     country_id = Column(Integer, ForeignKey('countries.id'), nullable=False)
     name = Column(String, nullable=False)
 
-    country = relationship("Country", back_populates='regions')
-    city = relationship("City", back_populates='regions')
+    country = relationship("Country", back_populates='region')
+    city = relationship("City", back_populates='region')
 
     def __repr__(self):
         return (f"<Region(id={self.id}, name='{self.name}', "

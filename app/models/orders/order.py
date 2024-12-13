@@ -63,8 +63,8 @@ class Order(Base):
     )
     confirmation_code = Column(String(50))
 
-    accommodation = relationship("Accommodation")
-    guest = relationship("User")
+    accommodation = relationship("Accommodation", back_populates="order")
+    user = relationship("User", back_populates="order")
 
     def __repr__(self):
         return (f"<Order(id={self.id},"

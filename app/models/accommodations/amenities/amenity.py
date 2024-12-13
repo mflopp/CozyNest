@@ -14,7 +14,13 @@ class Amenity(Base):
     )
 
     name = Column(String, nullable=False)
-    category = relationship("AmenitiesCategory")
+
+    amenities_category = relationship(
+        "AmenitiesCategory", back_populates='amenity'
+    )
+    accommodation_amenity = relationship(
+        "AccommodationAmenity", back_populates='amenity'
+    )
 
     def __repr__(self) -> str:
         return (f"<Amenity(id={self.id}, name={repr(self.name)}, "

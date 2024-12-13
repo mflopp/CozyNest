@@ -27,14 +27,17 @@ class User(Base):
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
     phone = Column(String, unique=True, nullable=False)
-    
+
     deleted = Column(Boolean, nullable=False, default=False)
 
     created_at = Column(TIMESTAMP, server_default=func.now())
     updated_at = Column(TIMESTAMP, onupdate=func.now())
 
-    role = relationship("UserRole")
-    info = relationship("UserInfo")
+    user_role = relationship("UserRole", back_populates='user')
+    user_info = relationship("UserInfo", back_populates='user')
+    accommodation = relationship("Accommodation", back_populates='user')
+    review = relationship("Review", back_populates='user')
+    order = relationship("Order", back_populates='user')
 
     def __repr__(self):
         return (

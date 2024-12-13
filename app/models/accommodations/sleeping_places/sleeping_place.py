@@ -1,5 +1,6 @@
 from sqlalchemy import CheckConstraint, Column, Integer, String
 from config import Base
+from sqlalchemy.orm import relationship
 
 
 class SleepingPlace(Base):
@@ -32,6 +33,10 @@ class SleepingPlace(Base):
         Integer,
         CheckConstraint('capacity >= 1 AND capacity <= 2'),
         default=1
+    )
+
+    accommodation_sleeping_place = relationship(
+        "AccommodationSleepingPlace", back_populates='sleeping_place'
     )
 
     def __repr__(self):

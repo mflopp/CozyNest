@@ -26,14 +26,27 @@ class Accommodation(Base):
     updated_at = Column(TIMESTAMP, onupdate=func.now())
 
     accommodation_type = relationship(
-        "AccommodationType", back_populates='accommodations'
+        "AccommodationType", back_populates='accommodation'
     )
-    owner = relationship(
-        "User", back_populates='accommodations'
+    accommodation_sleeping_place = relationship(
+        "AccommodationSleepingPlace", back_populates='accommodation'
     )
-    address = relationship(
-        "Address", back_populates='accommodations'
+    accommodation_amenity = relationship(
+        "AccommodationAmenity", back_populates='accommodation'
     )
+    accommodation_rule = relationship(
+        "AccommodationRule", back_populates='accommodation'
+    )
+    accommodation_availability = relationship(
+        "AccommodationAvailability", back_populates='accommodation'
+    )
+    accommodation_image = relationship(
+        "AccommodationImage", back_populates='accommodation'
+    )
+    address = relationship("Address", back_populates='accommodation')
+    user = relationship("User", back_populates="accommodation")
+    order = relationship("Order", back_populates="accommodation")
+    review = relationship("Review", back_populates="accommodation")
 
     def __repr__(self):
         return (f"<Accommodation(id={self.id}, "

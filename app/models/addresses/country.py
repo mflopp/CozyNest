@@ -9,7 +9,7 @@ class Country(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True, nullable=False)
 
-    region = relationship("Region", back_populates='countries')
+    region = relationship("Region", back_populates='country')
 
     def __repr__(self):
         return f"<Country(id={self.id}, name='{self.name}')>"

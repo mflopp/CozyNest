@@ -17,7 +17,7 @@ class AccommodationImage(Base):
     src = Column(String, nullable=False)
 
     accommodation = relationship(
-        "Accommodation", back_populates='accommodation_images'
+        "Accommodation", back_populates='accommodation_image'
     )
 
     def __repr__(self):

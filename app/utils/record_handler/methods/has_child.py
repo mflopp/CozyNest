@@ -9,6 +9,7 @@ def has_child(record: Type[Any], associated_model: Type[Any]) -> bool:
         logging.info(
             f"checking if the model {record} has childs in {associated_model}"
         )
+
         # Check that the record is associated with the SQLAlchemy mapping
         mapper = inspect(record).mapper
     except UnmappedInstanceError:

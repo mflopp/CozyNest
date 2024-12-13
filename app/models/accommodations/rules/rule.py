@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String
 from config import Base
+from sqlalchemy.orm import relationship
 
 
 class Rule(Base):
@@ -36,5 +37,9 @@ class Rule(Base):
     id = Column(Integer, primary_key=True)
     rule_text = Column(String, unique=True, nullable=False)
 
+    accommodation_rule = relationship(
+        "AccommodationRule", back_populates='rule'
+    )
+    
     def __repr__(self) -> str:
         return f"<Rule(id={self.id}, rule_text='{self.rule_text}')>"

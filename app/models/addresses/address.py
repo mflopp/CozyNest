@@ -15,8 +15,8 @@ class Address(Base):
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
 
-    city = relationship("City", back_populates='addresses')
-    accommodation = relationship("Accommodation", back_populates='addresses')
+    city = relationship("City", back_populates='address')
+    accommodation = relationship("Accommodation", back_populates='address')
 
     def __repr__(self):
         return (f"<Address(id={self.id}, street='{self.street}', "
