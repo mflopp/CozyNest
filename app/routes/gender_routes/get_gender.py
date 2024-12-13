@@ -26,9 +26,9 @@ def get_gender_by_name_handler():
     try:
         # Use the session_scope context manager
         with session_scope() as session:
-            genders = request.get_json()
+            gender_data = request.get_json()
             gender = GenderController.get_one_by_name(
-                genders, session
+                gender_data, session
             )
 
             if gender:

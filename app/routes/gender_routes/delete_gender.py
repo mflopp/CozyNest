@@ -39,7 +39,7 @@ def delete_gender_handler(id: int) -> tuple:
 
     except NoRecordsFound as e:
         message, code = e.args  # Unpacking the tuple
-        logging.error(f"gender ID {id} not found", exc_info=True)
+        logging.error(f"{message}", exc_info=True)
         return create_response(
             data=[("error", message)],
             code=code
@@ -47,10 +47,7 @@ def delete_gender_handler(id: int) -> tuple:
 
     except HasChildError as e:
         message, code = e.args  # Unpacking the tuple
-        logging.error(
-            f"Impossible to delete gender with ID {id}. "
-            "Records has child records", exc_info=True
-        )
+        logging.error(f"{message}", exc_info=True)
         # Returning validation error response
         return create_response(
             data=[("error", message)],
