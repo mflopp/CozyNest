@@ -80,7 +80,6 @@ class Validator:
     def validate_unique_fields(
         session: Session,
         Model: Type[Any],
-        fields: List[str],
         fields_values: Dict[str, Any]
     ) -> None:
-        validate_unique_fields(session, Model, fields, fields_values)
+        validate_unique_fields(session, Model, fields_values)
