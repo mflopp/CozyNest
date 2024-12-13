@@ -15,12 +15,14 @@ def get_first_record_by_criteria(
         model_name = Model.__name__
 
         record = session.query(Model).filter_by(**criteria).first()
+
         if not record:
             logging.warning(f'Record not found: {criteria}')
+
         return record
 
     except SQLAlchemyError as e:
         logging.error(
-            f"Unexpected database error while querying {model_name}: {e}"
+            f"Unexpected database error while fetching {model_name}: {e}"
         )
         return None
