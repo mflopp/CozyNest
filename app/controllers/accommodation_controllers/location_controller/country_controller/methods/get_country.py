@@ -5,32 +5,34 @@ from typing import Any
 
 from models import Country
 from utils import Finder, Validator
-from utils.error_handler import ValidationError
+from utils.error_handler import ValidationError, NoRecordsFound
 
 
 def get_country(field: str, value: Any, session: Session) -> Country:
     try:
-        possible_fields = {'id', 'name'}
+        # possible_fields = {'id', 'name'}
 
-        if field not in possible_fields:
-            raise ValidationError(f'Field must be in {possible_fields}')
+        # if field not in possible_fields:
+        #     raise ValidationError(f'Field must be in {possible_fields}')
 
-        if field == "id":
-            Validator.validate_id(value)
+        # if field == "id":
+        Validator.validate_id(value)
 
-        if field == 'name':
-            value = value.capitalize()
-            Validator.validate_name(value)
+        # if field == 'name':
+        #     value = value.capitalize()
+        #     Validator.validate_name(value)
 
         # Retrieve the record
         country = Finder.fetch_record(
             session=session,
             Model=Country,
-            field=field,
-            value=value
+            criteria={field: value}
         )
 
-        return country
+        if country:
+            return country
+
+        raise NoRecordsFound(f'No country found with ID: {value}')
 
     except ValidationError as e:
         logging.error(
