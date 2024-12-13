@@ -1,40 +1,47 @@
+import logging
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
-import logging
+from typing import List
 
-from models.addresses import Region
+from models import Region
+from utils import Finder
+from utils.error_handler import ValidationError, NoRecordsFound
 
-from ...utils import throw_error
 
-
-def get_regions(session: Session) -> list[str]:
-    """
-    Retrieves a list of all regions from the database.
-
-    Args:
-        session (Session): SQLAlchemy session object.
-
-    Returns:
-        list[str]: List of region names.
-
-    Raises:
-        404 Not Found: If no regions are found in the database.
-        500 Internal Server Error: If database query fails.
-    """
+def get_regions(session: Session) -> List[str]:
     try:
-        # Query all countries
-        regions = session.query(Region).all()
+        # Query all regions
+        regions = Finder.fetch_records(session, Region)
 
-        # Check if no countries are found
-        if not regions:
-            throw_error(404, "No Regions found in the database.")
+        # Log the number of countries found
+        Finder.log_found_amount(regions)
 
-        # Log number of regions found
-        logging.info(
-            f"{len(regions.id)} regions found in the database."
-        )
         return regions
+
+    except NoRecordsFound as e:
+        logging.warning(
+            {f"No records found: {e}"},
+            exc_info=True
+        )
+        raise
+
+    except ValidationError as e:
+        logging.error(
+            {f"Validation error occurred while fetching records: {e}"},
+            exc_info=True
+        )
+        raise
+
     except SQLAlchemyError as e:
-        throw_error(500, f"Database error while fetching regions: {e}")
+        logging.error(
+            {f"Data Base error occurred while fetching records: {e}"},
+            exc_info=True
+        )
+        raise
+
     except Exception as e:
-        throw_error(500, f"Unexpected error: {e}")
+        logging.error(
+            {f"Unexpected error while fetching records: {e}"},
+            exc_info=True
+        )
+        raise

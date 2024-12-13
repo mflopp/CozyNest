@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String
 from config import Base
+from sqlalchemy.orm import relationship
 
 
 class UserRole(Base):
@@ -16,6 +17,8 @@ class UserRole(Base):
     id = Column(Integer, primary_key=True)
     role = Column(String, unique=True, nullable=False)
     description = Column(String)
+
+    user = relationship("User", back_populates='user_role')
 
     def __repr__(self):
         return (f"<UserRole(id={self.id},"

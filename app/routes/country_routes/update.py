@@ -9,18 +9,6 @@ from config import session_scope
 
 @country_bp.route("/<int:id>", methods=['PUT'])
 def update_country_handler(id: int) -> Response:
-    """
-    Handle PUT request to update an existing country by its ID.
-
-    Args:
-        id (int): ID of the country to update.
-
-    Returns:
-        Response: JSON response containing a success or error message.
-
-    Raises:
-        Logs unexpected exceptions and returns a 500 error response.
-    """
     try:
         # Extract new data from the request
         new_data = request.get_json()
@@ -32,10 +20,10 @@ def update_country_handler(id: int) -> Response:
 
         # Using session_scope context manager for database session
         with session_scope() as session:
-            message, status = CountryController.update(id, new_data, session)
+            CountryController.update(id, new_data, session)
             return create_response(
-                data=[("info", message)],
-                code=status
+                data=[("info", 'Succesfully updated')],
+                code=200
             )
 
     except KeyError as e:

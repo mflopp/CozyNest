@@ -1,10 +1,10 @@
 import logging
-from controllers.user_controllers import fetch_user_settings
-from config import get_session
+
+from controllers import UserSettingsController
 from .user_settings_blueprint import user_settings_bp
-from flask import make_response
-from collections import OrderedDict
-import json
+
+from utils import create_response
+from config import session_scope
 
 
 @user_settings_bp.route("", methods=['GET'])
@@ -16,29 +16,25 @@ def get_user_settings_handler():
     Returns:
         tuple: A tuple with the response and HTTP status code.
     """
-    db = None
-
     try:
-        db = next(get_session())  # Call get_session() to get a session
-        user_settings = fetch_user_settings(db)
+        # Use the session_scope context manager
+        with session_scope() as session:
+            user_settings = UserSettingsController.get_all(session)
 
-        if user_settings:
-            response_data = OrderedDict([("user settings", user_settings)])
-            response_json = json.dumps(
-                response_data,
-                default=str,
-                sort_keys=False
-            )
-            response = make_response(response_json, 200)
-            response.headers['Content-Type'] = 'application/json'
+            if user_settings:
+                return create_response(
+                    data=[("user settings", user_settings)],
+                    code=200
+                )
 
-            return response
+            return "User settings not found", 404
 
-        return "User settings not found", 404
     except Exception as e:
         logging.error(f"Error occurred while retrieving user settings:"
                       f"{str(e)}")
-        return "Error finding user settings", 500
-    finally:
-        if db:
-            db.close()  # Ensure the database session is properly closed
+        return create_response(
+            data=[(
+                "error", f"Error finding user settings: {str(e)}"
+            )],
+            code=500
+        )

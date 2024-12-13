@@ -44,8 +44,10 @@ class AccommodationRule(Base):
         nullable=False
     )
 
-    accommodation = relationship("Accommodation")
-    rule = relationship("Rule")
+    accommodation = relationship(
+        "Accommodation", back_populates='accommodation_rule'
+    )
+    rule = relationship("Rule", back_populates='accommodation_rule')
 
     def __repr__(self):
         return (f"<AccommodationRule(id={self.id}, "

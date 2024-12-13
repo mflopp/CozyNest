@@ -7,7 +7,6 @@ from .delete import delete_country_handler
 from .update import update_country_handler
 
 
-
 __all__ = [
     'country_bp',
     'create_country_handler',

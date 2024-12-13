@@ -1,18 +1,24 @@
 import logging
 from sqlalchemy.orm import Session
-from controllers.general_controllers import add_record
-from models.users import UserInfo
 from sqlalchemy.sql import func
-from controllers.controller_utils.validations import validate_data
+
+from models import UserInfo
+
 from datetime import datetime
 from .get_user_info import fetch_user_info
 
-def update_user_info(id: int, user_data: dict, gender_id: int, user_settings_id: int, session: Session):
-    
+
+def update_user_info(
+    id: int,
+    user_data: dict,
+    gender_id: int,
+    user_settings_id: int,
+    session: Session
+):
     try:
         # Start a new transaction
         with session.begin_nested():
-        
+
             # required fields
             fields = ['first_name', 'last_name']
 
@@ -23,7 +29,7 @@ def update_user_info(id: int, user_data: dict, gender_id: int, user_settings_id:
                 required_fields=fields,
                 unique_fields=[]  # ???
             )
-            
+
             # Fetch existing user info from the database
             user_info = fetch_user_info(id, session)
             if not user_info:

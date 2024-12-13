@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from typing import List, Dict, Any
-from utils.env_utils import check_env_variable
+from utils import check_env_variable
 
 
 def load_config(var_names: List[str],

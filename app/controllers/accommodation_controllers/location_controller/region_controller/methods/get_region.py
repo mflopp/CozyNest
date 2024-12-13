@@ -1,57 +1,53 @@
+import logging
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
-import logging
-from models.addresses import Region
-from controllers.controller_utils import fetch_record
+from typing import Any
 
-from ...utils import throw_error, set_filter_criteria
-from ...validations import validate_id, validate_field, validate_value
+from models import Region
+from utils import Validator, Finder
+from utils.error_handler import ValidationError
 
 
-def get_region(field: str, value: any, session: Session) -> Region:
-    """
-    Retrieves a region record from the database by 'id' or 'name'.
-
-    Args:
-        field (str): The name of the field to filter by ('id' or 'name').
-        value (any): The value of the field to filter by.
-        session (Session): The SQLAlchemy session object for DB interaction.
-
-    Returns:
-        Country: The retrieved country record.
-
-    Raises:
-        400 Bad Request: If the field or value is invalid.
-        404 Not Found: If no country is found with the given field and value.
-        500 Internal Server Error: For any other errors.
-    """
-    validate_field(field)
-    validate_value(value, field)
-    validate_id(value, field)
-
+def get_region(field: str, value: Any, session: Session) -> Region:
     try:
-        # Build filter criteria
-        filter_criteria = set_filter_criteria(field, value)
-        logging.debug(f"Filter criteria created: {filter_criteria}")
+        possible_fields = {'id', 'name'}
+
+        if field not in possible_fields:
+            raise ValidationError(f'Field must be in {possible_fields}')
+
+        if field == "id":
+            Validator.validate_id(value)
+
+        if field == "name":
+            Validator.validate_name(value)
 
         # Retrieve the record
-        region = fetch_record(
+        region = Finder.fetch_record(
             session=session,
             Model=Region,
-            criteria=filter_criteria,
-            model_name='Region'
+            field=field,
+            value=value
         )
 
         return region
 
-    except SQLAlchemyError as e:
-        throw_error(
-            500,
-            f"DB error occurred while querying region by {field}: {e}"
+    except ValidationError as e:
+        logging.error(
+            {f"Validation Error occurred while fetching record: {e}"},
+            exc_info=True
         )
+        raise
+
+    except SQLAlchemyError as e:
+        logging.error(
+            {f"Data Base Error occurred while fetching record: {e}"},
+            exc_info=True
+        )
+        raise
 
     except Exception as e:
-        throw_error(
-            500,
-            f"Unexpected error while processing the request: {e}"
+        logging.error(
+            {f"Unexpected Error occurred while fetching record: {e}"},
+            exc_info=True
         )
+        raise

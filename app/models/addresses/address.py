@@ -4,37 +4,6 @@ from sqlalchemy.orm import relationship
 
 
 class Address(Base):
-    """
-    Represents the address details of an entity, including its geographical
-    location.
-
-    Attributes:
-        id (int): The primary key of the address record.
-        city_id (int): A foreign key linking to the 'cities' table.
-        street (str): The name of the street.
-        building (str): The building number or identifier.
-        apartment (str, optional): The apartment number.
-        zip_code (str): The postal code of the address.
-        latitude (float): The latitude of the address location.
-        longitude (float): The longitude of the address location.
-        city (City): A relationship object representing the associated city.
-
-    Relationships:
-        city: Establishes a relationship with the `City` model.
-
-    Example:
-        >>> address = Address(
-        ...     city_id=1,
-        ...     street='Main Street',
-        ...     building='123',
-        ...     apartment='4A',
-        ...     zip_code='12345',
-        ...     latitude=40.7128,
-        ...     longitude=-74.0060
-        ... )
-        >>> print(address)
-        <Address(id=1, street='Main Street', building='123', zip_code='12345')>
-    """
     __tablename__ = 'addresses'
 
     id = Column(Integer, primary_key=True)
@@ -46,7 +15,8 @@ class Address(Base):
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
 
-    city = relationship("City")
+    city = relationship("City", back_populates='address')
+    accommodation = relationship("Accommodation", back_populates='address')
 
     def __repr__(self):
         return (f"<Address(id={self.id}, street='{self.street}', "

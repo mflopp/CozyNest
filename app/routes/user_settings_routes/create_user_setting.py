@@ -1,34 +1,79 @@
-from flask import request
 import logging
+from flask import request
+from sqlalchemy.exc import SQLAlchemyError
+from typing import Dict
 
-from controllers.user_controllers import add_user_setting
-from config import get_session
+from utils.error_handler import ValidationError
+from controllers import UserSettingsController
 from .user_settings_blueprint import user_settings_bp
+
+from utils import create_response
+from config import session_scope
 
 
 @user_settings_bp.route("", methods=['POST'])
-def create_user_setting_handler() -> tuple:
+def create_user_setting_handler() -> Dict:
     """
-    Endpoint for creating a new user setting. Receives user data as JSON and returns
+    Endpoint for creating a new user setting. Receives user
+    data as JSON and returns
     the result of creating a user setting in the database.
 
     Returns:
         tuple: A tuple with the response and HTTP status code.
     """
-    db = None
-
     try:
-        db = next(get_session())
+        # Use the session_scope context manager
+        with session_scope() as session:
 
-        user_setting = request.get_json()
-        response, status = add_user_setting(user_setting, db)
-        print(f"\033[34m ############# create_user_setting_handler: {response}\033[0m")
-        return response, status
+            user_setting_data = request.get_json()
+            user_setting = UserSettingsController.create(
+                user_setting_data,
+                session
+            )
+            return create_response(
+                data=[
+                    ("id", user_setting.id),
+                    ("currency", user_setting.currency),
+                    ("language", user_setting.language)
+                ],
+                code=200
+            )
+
+    except ValidationError as e:
+        # Logging validation error
+        logging.error(
+            f"Validation error while creating a user setting: {str(e)}"
+        )
+
+        # Returning validation error response
+        return create_response(
+            data=[("error", str(e))],
+            code=400
+        )
+
+    except ValueError as e:
+        logging.error(
+            f"Value Error occured while creating a user setting: {e}",
+            exc_info=True
+        )
+        return create_response(
+            data=[("error", str(e))],
+            code=400
+        )
+
+    except SQLAlchemyError as e:
+        logging.error(
+            {f"Data Base error occurred while creating a user setting: {e}"},
+            exc_info=True
+        )
+        return create_response(
+            data=[("error", str(e))],
+            code=400
+        )
+
     except Exception as e:
         logging.error(f"Error occurred while creating user setting: {str(e)}")
-        return {"error": "Error creating user setting"}, 500
-    finally:
-        if db:
-            db.close()
-            print("\033[34m ############# after closing DB\033[0m")
-        print("\033[34m ############# outside cloding DB\033[0m")
+        return create_response(
+            data=[("error", f"Error creating a user setting: {str(e)}")],
+            code=500
+        )

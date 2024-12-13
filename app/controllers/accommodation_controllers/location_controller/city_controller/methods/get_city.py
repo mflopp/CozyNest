@@ -2,10 +2,7 @@ import logging
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
-from models.addresses import City
-from controllers.controller_utils import fetch_record
-from ...utils import throw_error, set_filter_criteria
-from ...validations import validate_id, validate_field, validate_value
+from models import City
 
 
 def get_city(field: str, value: any, session: Session) -> City:

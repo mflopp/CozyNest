@@ -1,10 +1,10 @@
 import logging
 from sqlalchemy.orm import Session
 from models.users import UserRole
-from controllers.controller_utils import get_first_record_by_criteria
+
 
 def fetch_user_roles(session: Session):
-    
+
     try:
         # get user roles list
         user_roles = session.query(

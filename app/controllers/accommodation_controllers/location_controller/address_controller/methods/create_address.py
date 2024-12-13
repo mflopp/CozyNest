@@ -2,7 +2,7 @@ import logging
 from sqlalchemy.orm import Session
 
 from models.addresses import Address
-from controllers.controller_utils.validations import validate_data
+from controllers.controller_utils.validate_handler import validate_data
 from controllers.general_controllers import add_record
 from city_controller import CityController
 from ...utils import throw_error

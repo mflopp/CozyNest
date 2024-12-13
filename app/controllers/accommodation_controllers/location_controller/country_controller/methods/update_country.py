@@ -1,61 +1,69 @@
-from sqlalchemy.orm import Session
 import logging
-from models.addresses import Country
-from controllers.controller_utils.validations import validate_data
-from controllers.general_controllers import update_record
+from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
+
+from models import Country
 from .get_country import get_country
+
+from utils import Validator, Recorder
+from utils.error_handler import ValidationError, NoRecordsFound
 
 
 def update_country(country_id: int, data: dict, session: Session) -> Country:
-    """
-    Updates an existing country record in the database.
-
-    Args:
-        country_id (int): The ID of the country to update.
-        data (dict): The new data for the country. Must include required
-                     fields.
-        session (Session): SQLAlchemy session for database operations.
-
-    Returns:
-        Optional[Country]: The updated Country object if successful.
-
-    Raises:
-        ValueError: If validation fails or the record does not exist.
-        Exception: For unexpected errors during the update process.
-    """
     try:
         # Begin a nested transaction to handle potential rollback
         with session.begin_nested():
-            # Define fields for validation
-            fields = ['name']
-
             # Validate the input data to ensure it meets the model requirements
-            validate_data(
-                session=session,
-                Model=Country,
-                data=data,
-                required_fields=fields,
-                unique_fields=fields
-            )
+            field = 'name'
+            Validator.validate_required_field(field, data)
 
-            # Fetch the existing country record
+            new_name = data.get(field)
+
+            Validator.validate_unique_field(session, Country, field, new_name)
+            Validator.validate_name(new_name)
+
+            Validator.validate_id(country_id)
+
+            # Fetch the existing record
             country = get_country('id', country_id, session)
 
             # Attempt to update the record
-            result = update_record(
-                session=session,
-                record=country,
-                new_data=data,
-                entity="Country"
-            )
+            Recorder.update(session, country, data)
 
         logging.info(f"Country with ID {country_id} successfully updated.")
-        return result
-    except ValueError as ve:
-        logging.warning(f"Validation or record error: {ve}")
+        return country
+
+    except NoRecordsFound as e:
+        logging.error(
+            {f"No records found for updating: {e}"},
+            exc_info=True
+        )
         raise
+
+    except ValidationError as e:
+        logging.error(
+            f"Validation Error occured while updating: {e}",
+            exc_info=True
+        )
+        raise
+
+    except ValueError as e:
+        logging.error(
+            f"Value Error occured while updating: {e}",
+            exc_info=True
+        )
+        raise
+
+    except SQLAlchemyError as e:
+        logging.error(
+            {f"Data Base error occurred while updating: {e}"},
+            exc_info=True
+        )
+        raise
+
     except Exception as e:
         logging.error(
-            f"Unexpected error during country update: {e}", exc_info=True
+            f"Unexpected error occured while updating: {e}",
+            exc_info=True
         )
         raise

@@ -1,8 +1,11 @@
 import logging
+
 from controllers import UserController
 from .users_blueprint import users_bp
+
 from utils import create_response
 from config import session_scope
+
 
 @users_bp.route("", methods=['GET'])
 def get_users_handler() -> list:

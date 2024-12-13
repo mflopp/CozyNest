@@ -1,25 +1,11 @@
+import logging
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
-import logging
-from controllers.controller_utils import get_first_record_by_criteria
-from models.users import User
+
+from models import User
 
 
 def fetch_only_user(id: int, session: Session) -> dict:
-    """
-    Fetches user data from the database by ID, including related information.
-
-    Args:
-        id (int): User ID.
-        db (Session): SQLAlchemy database session.
-
-    Returns:
-        dict: User data including personal details, role, and settings.
-
-    Raises:
-        404: If user is not found.
-        500: For other server errors.
-    """
     try:
         # Query user and related data
         user = get_first_record_by_criteria(
@@ -27,7 +13,7 @@ def fetch_only_user(id: int, session: Session) -> dict:
             User,
             {"id": id}
         )
-        
+
         if not user:
             return False
 

@@ -1,10 +1,10 @@
 import logging
 from sqlalchemy.orm import Session
-from models.users import UserInfo
-from controllers.controller_utils import get_first_record_by_criteria
+
+from models import UserInfo
+
 
 def fetch_user_info(id: int, session: Session):
-    
     try:
         # get user roles list
         user_info = get_first_record_by_criteria(

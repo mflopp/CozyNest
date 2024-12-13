@@ -1,47 +1,62 @@
-from sqlalchemy.orm import Session
 import logging
-from controllers.general_controllers import delete_record
+from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
+
+from models import Region
+from utils import Recorder, Validator
+from utils.error_handler import (
+    ValidationError,
+    NoRecordsFound,
+    HasChildError
+)
+
 from .get_country import get_country
 
 
 def delete_country(id: int, session: Session):
-    """
-    Deletes a country by its ID from the database.
-
-    Args:
-        id (int): The ID of the country to delete.
-        session (Session): SQLAlchemy session object.
-
-    Returns:
-        dict: Response indicating successful deletion.
-
-    Raises:
-        404 Not Found: If the country is not found.
-        500 Internal Server Error: If database operation fails.
-    """
     try:
+        Validator.validate_id(id)
 
         with session.begin_nested():
             # Attempt to fetch the country
-            country = get_country(field='id', value=id, session=session)
-            # Attempt to delete the record
-            result = delete_record(
-                session=session,
-                record=country,
-                entity="Country"
-            )
+            country = get_country(id, session)
+            if not country:
+                logging.info('No country to delete')
+                raise NoRecordsFound
 
-        session.flush()
-        logging.info(f"Successfully deleted country with id={id}.")
-        return result
+            if Recorder.has_child(country, Region):
+                raise HasChildError
 
-    except ValueError as ve:
-        logging.error(f"Deletion error: {ve}", exc_info=True)
+            Recorder.delete(session, country)
+
+    except HasChildError as e:
+        logging.error(e, exc_info=True)
+        raise
+
+    except NoRecordsFound as e:
+        logging.error(
+            {f"No records found for deleting: {e}"},
+            exc_info=True
+        )
+        raise
+
+    except ValidationError as e:
+        logging.error(
+            {f"Validation error occurred while deleting: {e}"},
+            exc_info=True
+        )
+        raise
+
+    except SQLAlchemyError as e:
+        logging.error(
+            {f"Data Base error occurred while deleting: {e}"},
+            exc_info=True
+        )
         raise
 
     except Exception as e:
         logging.error(
-            f"Unexpected error during deleting: {e}",
+            {f"Unexpected error while deleting: {e}"},
             exc_info=True
         )
         raise
