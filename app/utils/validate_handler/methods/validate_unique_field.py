@@ -23,8 +23,7 @@ def validate_unique_field(
         record = Finder.fetch_record(
             session=session,
             Model=Model,
-            field=field,
-            value=value
+            criteria={field: value}
         )
 
         # Log if a duplicate is found
