@@ -1,34 +1,20 @@
 import logging
 from flask import Response
+from sqlalchemy.exc import SQLAlchemyError
 
 from controllers import CountryController
-from .countries_blueprint import country_bp
+from utils.error_handler import NoRecordsFound, ValidationError
 from utils import create_response
 from config import session_scope
+from .countries_blueprint import country_bp
 
 
 @country_bp.route("/<int:id>", methods=['GET'])
 def get_country_by_id_handler(id: int) -> Response:
-    """
-    Handle GET request to retrieve a country by its ID.
-
-    Args:
-        id (int): ID of the country to retrieve.
-
-    Returns:
-        Response: JSON response containing the country data or
-                  an error message.
-
-    Raises:
-        Logs unexpected exceptions and returns a 500 error response.
-    """
     try:
-        # Using session_scope context manager for database session
         with session_scope() as session:
-            # Retrieve the country from the database
-            country = CountryController.get_one_by_id(id, session)
+            country = CountryController.get_country(id, session)
 
-            # Return the country data if found
             if country:
                 return create_response(
                     data=[("countries", country)],
@@ -41,16 +27,51 @@ def get_country_by_id_handler(id: int) -> Response:
                 code=404
             )
 
-    except Exception as e:
-        # Log unexpected errors with traceback
+    except ValidationError as e:
+        msg = f"Validation Error occurred while fetching country with ID {id}"
+        logging.error(f"{msg}: {str(e)}", exc_info=True)
+
+        return create_response(
+            data=[("error", msg)],
+            code=409
+        )
+
+    except NoRecordsFound as e:
+        msg = f"No records found while fetching country with ID {id}"
+        logging.error(f"{msg}: {str(e)}", exc_info=True)
+
+        return create_response(
+            data=[("error", msg)],
+            code=404
+        )
+
+    except ValueError as e:
         logging.error(
-            f"Error occurred while retrieving country with ID {id}: {str(e)}",
+            f"Value Error occured while fetching: {str(e)}",
             exc_info=True
         )
+
         return create_response(
-            data=[(
-                "error",
-                "An unexpected error occurred while retrieving country data."
-            )],
+            data=[("error", str(e))],
+            code=400
+        )
+
+    except SQLAlchemyError as e:
+        logging.error(
+            {f"Data Base error occurred while fetching: {e}"},
+            exc_info=True
+        )
+
+        return create_response(
+            data=[("error", str(e))],
+            code=400
+        )
+
+    except Exception as e:
+        msg = "An unexpected error occurred while fetching"
+        logging.error(f"{msg}: {str(e)}", exc_info=True)
+
+        return create_response(
+            data=[("error", msg)],
             code=500
         )
