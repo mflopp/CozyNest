@@ -32,21 +32,21 @@ def delete_user_setting_handler(id: int) -> tuple:
 
             return create_response(
                 data=[
-                    ("info", f"User ID {id} setting deleted successfully")
+                    ("info", f"User setting ID {id} deleted successfully")
                 ],
                 code=200
             )
 
-    except NoRecordsFound as no_record:
-        message, code = no_record.args  # Unpacking the tuple
+    except NoRecordsFound as e:
+        message, code = e.args  # Unpacking the tuple
         logging.error(f"User setting ID {id} not found", exc_info=True)
         return create_response(
             data=[("error", message)],
             code=code
         )
 
-    except HasChildError as child_error:
-        message, code = child_error.args  # Unpacking the tuple
+    except HasChildError as e:
+        message, code = e.args  # Unpacking the tuple
         logging.error(
             f"Impossible to delete user setting with ID {id}. "
             "Records has child records", exc_info=True
@@ -57,16 +57,16 @@ def delete_user_setting_handler(id: int) -> tuple:
             code=code
         )
 
-    except SQLAlchemyError as err:
+    except SQLAlchemyError as e:
         logging.error(
-            {f"Data Base error occurred while deleting: {err}"},
+            {f"Data Base error occurred while deleting: {e}"},
             exc_info=True
         )
         return create_response(
             data=[(
                 "error",
                 f"DB error occurred while deleting user setting with ID {id}: "
-                f"{str(err)}"
+                f"{str(e)}"
             )],
             code=500
         )
