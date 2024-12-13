@@ -7,7 +7,7 @@ def validate_id(id_value: int) -> None:
 
     if not (isinstance(id_value, int) and id_value > 0):
         msg = 'ID must be positive integer'
-        logging.info(msg)
+        logging.error(msg)
         raise ValidationError(msg)
 
     logging.info('ID validation successfully finidhed')
