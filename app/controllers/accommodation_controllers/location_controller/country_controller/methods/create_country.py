@@ -16,14 +16,13 @@ def create_country(data: Dict, session: Session) -> Country:
 
             name = data.get(field)
 
-            Validator.validate_unique_field(
+            Validator.validate_unique_fields(
                 session=session,
                 Model=Country,
-                field=field,
-                value=name
+                fields_values={field: name}
             )
 
-            Validator.validate_geografic_name(name)
+            Validator.validate_name(name)
 
             logging.info('Given country name passed all validations!')
 
