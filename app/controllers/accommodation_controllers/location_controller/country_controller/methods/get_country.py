@@ -25,28 +25,28 @@ def get_country(id: int, session: Session) -> Country:
 
     except NoRecordsFound as e:
         logging.error(
-            {f"No Records Found occurred while fetching Country: {e}"},
+            {f"No Records Found for fetching: {e}"},
             exc_info=True
         )
         raise
 
     except ValidationError as e:
         logging.error(
-            {f"Validation error occurred while fetching Country: {e}"},
+            {f"Validation Error occurred while fetching: {e}"},
             exc_info=True
         )
         raise
 
     except SQLAlchemyError as e:
         logging.error(
-            {f"DB error occurred while fetching Country: {e}"},
+            {f"Data Base error occurred while fetching: {e}"},
             exc_info=True
         )
         raise
 
     except Exception as e:
         logging.error(
-            {f"Unexpected error while fetching Country: {e}"},
+            {f"Unexpected error while fetching: {e}"},
             exc_info=True
         )
         raise
