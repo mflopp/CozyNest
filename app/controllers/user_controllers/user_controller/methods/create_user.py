@@ -4,7 +4,7 @@ from sqlalchemy.sql import func
 from models import User, Gender
 
 from controllers.user_controllers.user_settings_controller.methods import fetch_user_setting
-from controllers.user_controllers.user_info_controller_methods import add_user_info
+# from controllers.user_controllers.user_info_controller_methods import add_user_info
 from controllers.user_controllers.user_role_controller.methods import fetch_user_role
 
 from utils.error_handler import ValidationError
