@@ -23,7 +23,7 @@ def add_user_setting(user_data: Dict, session: Session) -> UserSettings:
             currency = user_data.get(fields[0])
             language = user_data.get(fields[1])
 
-            Validator.validate_unique_fields(
+            Validator.validate_uniqueness(
                 session, UserSettings,
                 relevant_values
             )
