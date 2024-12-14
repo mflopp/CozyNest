@@ -28,19 +28,20 @@ def get_genders_handler():
                     code=200
                 )
 
-            return "User settings not found", 404
+            return {"message": "Gender not found"}, 404
 
     except SQLAlchemyError as e:
+        msg = f"DB error occured while fetching genders: {str(e)}"
+        logging.error(msg)
         return create_response(
-            data=[(
-                "error", f"DB error occured while fetching genders{str(e)}"
-            )],
+            data=[("error", msg)],
             code=500
         )
 
     except Exception as e:
-        logging.error(f"Error occurred while fetching genders: {str(e)}")
+        msg = f"Error occurred while fetching genders: {str(e)}"
+        logging.error(msg)
         return create_response(
-            data=[("error", f"Error while fetching genders: {str(e)}")],
+            data=[("error", msg)],
             code=500
         )
