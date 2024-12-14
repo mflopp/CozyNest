@@ -11,21 +11,27 @@ from utils.error_handler import ValidationError, NoRecordsFound
 
 def update_country(country_id: int, data: dict, session: Session) -> Country:
     try:
+        logging.info(f"Country with ID {country_id} updating started.")
         # Begin a nested transaction to handle potential rollback
         with session.begin_nested():
+            Validator.validate_id(country_id)
+
             # Validate the input data to ensure it meets the model requirements
             field = 'name'
             Validator.validate_required_field(field, data)
 
             new_name = data.get(field)
 
-            Validator.validate_unique_field(session, Country, field, new_name)
+            Validator.validate_uniqueness(
+                session=session,
+                Model=Country,
+                criteria={field: new_name}
+            )
+
             Validator.validate_name(new_name)
 
-            Validator.validate_id(country_id)
-
             # Fetch the existing record
-            country = get_country('id', country_id, session)
+            country = get_country(country_id, session)
 
             # Attempt to update the record
             Recorder.update(session, country, data)
