@@ -22,7 +22,7 @@ def del_gender(id: int, session: Session):
             gender = fetch_gender('id', id, session)
 
             if not gender:
-                msg = f"No records found for deleting with ID {id}"
+                msg = f"gender ID {id} not found"
                 raise NoRecordsFound(msg)
 
             # Check if current gender is in use in user_info
@@ -30,8 +30,10 @@ def del_gender(id: int, session: Session):
                 # Attempt to delete the record
                 Recorder.delete(session, gender)
             else:
-                msg = f"Impossible to delete gender with ID {id}. "
-                "Record has child records"
+                msg = (
+                    f"Impossible to delete gender with ID {id}. "
+                    "Record has child records"
+                )
                 raise HasChildError(msg)
 
         # commit the transaction after 'with' block

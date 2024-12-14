@@ -30,8 +30,10 @@ def del_user_setting(id: int, session: Session):
                 # Attempt to delete the record
                 Recorder.delete(session, user_setting)
             else:
-                msg = f"Impossible to delete user setting with ID {id}. "
-                "Record has child records"
+                msg = (
+                    f"Impossible to delete user setting with ID {id}. "
+                    "Record has child records"
+                )
                 raise HasChildError(msg)
 
         # commit the transaction after 'with' block

@@ -19,7 +19,7 @@ def fetch_gender(
         if field == "id":
             filter_criteria = {field: value}
         else:
-            # else check pair 'gender' exists in user request
+            # else check if 'gender' parameter exists in user request
             Validator.validate_required_field(field, value)
             filter_criteria = Finder.extract_required_data([field], value)
 
@@ -34,7 +34,7 @@ def fetch_gender(
 
     except SQLAlchemyError as e:
         raise SQLAlchemyError(
-            {f"DB error occurred while querying country by {field}: {e}"}, 500
+            {f"DB error occurred while querying gender by {field}: {e}"}, 500
         )
 
     except ValidationError:

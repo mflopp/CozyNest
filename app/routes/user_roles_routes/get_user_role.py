@@ -1,8 +1,12 @@
 from flask import request
 from models import UserRole
 import logging
+from sqlalchemy.exc import SQLAlchemyError
+
 from controllers import UserRoleController
 from .user_roles_blueprint import user_roles_bp
+from utils.error_handler import ValidationError
+
 from utils import create_response
 from config import session_scope
 
@@ -20,16 +24,11 @@ def get_user_role_handler() -> UserRole:
         tuple: A tuple with the response and HTTP status code.
     """
     try:
-        # Extract role name from query parameters
-        role_name = request.get_json()['role']
-        if not role_name:
-            return create_response(
-                data=[("error", "Role name is required")],
-                code=400
-            )
+
         # Use the session_scope context manager
         with session_scope() as session:
-            user_role = UserRoleController.get_one_by_role(role_name, session)
+            role_data = request.get_json()
+            user_role = UserRoleController.get_one_by_role(role_data, session)
 
             if user_role:
                 return create_response(
@@ -42,6 +41,24 @@ def get_user_role_handler() -> UserRole:
                 )
 
             return {"message": "User role not found"}, 404
+
+    except SQLAlchemyError as e:
+        logging.error(f"{e}")
+        return create_response(
+            data=[("error", f"{str(e)}")],
+            code=500
+        )
+
+    except ValidationError as e:
+        logging.error(f"Validation error while getting a user role: {str(e)}")
+        return create_response(
+            data=[(
+                "error",
+                f"Validation error while getting a user role: {str(e)}"
+            )],
+            code=500
+        )
+
     except Exception as e:
         logging.error(f"Error occurred while retrieving user role: {str(e)}")
         return create_response(
