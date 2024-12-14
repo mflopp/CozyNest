@@ -51,11 +51,10 @@ def get_gender_by_name_handler():
         )
 
     except ValidationError as e:
-        logging.error(f"Validation error while getting a gender: {str(e)}")
+        msg = f"Validation error while getting a gender: {str(e)}"
+        logging.error(msg)
         return create_response(
-            data=[(
-                "error", f"Validation error while getting a gender: {str(e)}"
-            )],
+            data=[("error", msg)],
             code=500
         )
 
