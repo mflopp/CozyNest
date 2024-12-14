@@ -29,7 +29,7 @@ class Finder:
     def fetch_records(
         session: Session,
         Model: Type[Any],
-        filter_conditions: Optional[Any] = None,
+        filter_conditions: Dict[str, Any] = {},
         order_by: Optional[Any] = None
     ) -> List:
         return fetch_records(session, Model, filter_conditions, order_by)
