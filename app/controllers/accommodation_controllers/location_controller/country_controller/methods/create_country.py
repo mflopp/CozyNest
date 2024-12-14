@@ -16,10 +16,10 @@ def create_country(data: Dict, session: Session) -> Country:
 
             name = data.get(field)
 
-            Validator.validate_unique_fields(
+            Validator.validate_uniqueness(
                 session=session,
                 Model=Country,
-                fields_values={field: name}
+                criteria={field: name}
             )
 
             Validator.validate_name(name)
