@@ -11,7 +11,7 @@ ERR_MSG = "Error occurred while fetching Region records"
 TRACEBACK = True
 
 
-def get_countries(session: Session) -> List[Region]:
+def get_regions(session: Session) -> List[Region]:
     try:
         regions = Finder.fetch_records(session, Region)
         Finder.log_found_amount(regions)
