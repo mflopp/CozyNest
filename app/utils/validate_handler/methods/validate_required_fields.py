@@ -19,6 +19,8 @@ def validate_required_fields(
     fields: List[str],
     data: Dict[str, str]
 ) -> None:
+    logging.info('Validation of required fields started.')
+
     for field in fields:
         validate_required_field(field, data)
 
