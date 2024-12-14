@@ -1,64 +1,79 @@
 import logging
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
+from typing import Dict
 
 from models import Region
 from ...country_controller import CountryController
-from utils import (
-    Validator,
-    ValidationError,
-    Recorder
-)
+from utils import Validator, Recorder
+from utils.error_handler import ValidationError, NoRecordsFound
+
+ERR_MSG = "Error occurred while Region record creating"
+TRACEBACK = False
 
 
-def create_region(data: dict, session: Session) -> Region:
+def create_region(data: Dict, session: Session) -> Region:
     try:
         with session.begin_nested():
-            # Define required and unique fields for validation
             required_fields = ['name', 'country_id']
-
-            # Validate the input data to ensure it meets the model requirements
             Validator.validate_required_fields(required_fields, data)
 
-            name = data['name']
+            name = data.get('name')
+            country_id = data.get('country_id')
 
-            Validator.validate_unique_field(session, Region, 'name', name)
+            Validator.validate_uniqueness(
+                session=session,
+                Model=Region,
+                criteria={'name': name, 'country_id': country_id}
+            )
+
             Validator.validate_name(name)
 
-            # Fetch the country data
-            country = CountryController.get_one_by_id(
+            country = CountryController.get_country(
                 country_id=data['country_id'],
                 session=session
             )
+            if not country:
+                raise NoRecordsFound
 
-            # Create a new Region object
             new_region = Region(
                 country_id=country.id,
                 name=data['name']
             )
+            if not new_region:
+                raise SQLAlchemyError
 
-            # Attempt to add the record
             Recorder.add(session, new_region)
 
             return new_region
 
+    except NoRecordsFound as e:
+        logging.error(
+            f"No Records Found for creatings: {e}",
+            exc_info=TRACEBACK
+        )
+        raise
+
     except ValidationError as e:
         logging.error(
-            {f"Validation error occurred while creating: {e}"},
-            exc_info=True
+            f"Validation {ERR_MSG}: {e}", exc_info=TRACEBACK
+        )
+        raise
+
+    except ValueError as e:
+        logging.error(
+            f"Value {ERR_MSG}: {e}", exc_info=TRACEBACK
         )
         raise
 
     except SQLAlchemyError as e:
         logging.error(
-            {f"Data Base error occurred while creating: {e}"},
-            exc_info=True
+            f"Data Base {ERR_MSG}: {e}", exc_info=TRACEBACK
         )
         raise
 
     except Exception as e:
         logging.error(
-            {f"Unexpected error while creating: {e}"},
-            exc_info=True
+            f"Unexpected {ERR_MSG}: {e}", exc_info=TRACEBACK
         )
         raise
