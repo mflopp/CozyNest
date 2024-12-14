@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 import logging
 
 from models.users import Gender
-from controllers.user_controllers.user_info_controller_methods import update_user_info, fetch_user_info
+# from controllers.user_controllers.user_info_controller_methods import update_user_info, fetch_user_info
 from controllers.user_controllers.user_role_controller.methods import fetch_user_role
 from controllers.user_controllers.user_settings_controller.methods import update_user_setting
 from .get_only_user import fetch_only_user
