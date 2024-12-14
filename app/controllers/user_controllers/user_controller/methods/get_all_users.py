@@ -1,6 +1,5 @@
 from sqlalchemy.orm import Session
 import logging
-from flask import abort
 
 from models.users import User, UserInfo, UserRole, Gender, UserSettings
 
