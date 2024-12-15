@@ -8,7 +8,7 @@ CONDITIONS = [
         "error": "The name must start with an uppercase letter."
     },
     {
-        "pattern": r"^.{3,}",
+        "pattern": r"^.{2,}",
         "error": "The name must be longer than 2 characters."
     },
     {
