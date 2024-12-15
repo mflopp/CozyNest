@@ -21,12 +21,12 @@ def add_user(user_data: dict, session: Session):
             fields = ['email', 'password', 'phone']
             Validator.validate_required_fields(fields, user_data)
             relevant_values = Finder.extract_required_data(fields, user_data)
-            print(f"\033[34m ############# relevant_values: {relevant_values}\033[0m")
+
+            # validate data format
             Validator.validate_email(relevant_values['email'])
-            # print("\033[34m ############# email validation: \033[0m")
             Validator.validate_pswrd(relevant_values['password'])
-            # print("\033[34m ############# password validation: \033[0m")
             Validator.validate_phone(relevant_values['phone'])
+            # Validate uniqueness of email and phone in the DB
             Validator.validate_uniqueness(
                 session, User, {'email': user_data.get('email')}
             )
@@ -43,7 +43,6 @@ def add_user(user_data: dict, session: Session):
                 user_data,
                 session
             )
-            print(f"\033[34m ############# user_info created: {user_info}\033[0m")
 
             # getting default user role from the DB
             user_role_default = "User"
@@ -58,7 +57,6 @@ def add_user(user_data: dict, session: Session):
                     f"Default user role {user_role_default} was not found "
                     "in the DB"
                 )
-            print(f"\033[34m ############# user_role created: {user_info}\033[0m")
 
             # Create the user
             user = User(
