@@ -1,4 +1,6 @@
 import re
+from utils.error_handler import ValidationError
+
 from .validate_requirements import validate_requirements
 
 
@@ -35,4 +37,8 @@ def validate_phone(phone_number: str) -> None:
     Raises:
         ValidationError: If the phone number is invalid.
     """
-    validate_requirements(phone_number, is_valid_mobile_number)
+    reqs = ["+numbers"]
+    try:
+        validate_requirements(phone_number, is_valid_mobile_number, reqs)
+    except ValidationError:
+        raise
