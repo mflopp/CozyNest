@@ -1,5 +1,6 @@
 import re
 from .validate_requirements import validate_requirements
+from utils.error_handler import ValidationError
 
 
 def is_valid_pswrd(password: str) -> bool:
@@ -42,4 +43,8 @@ def validate_password(password: str) -> None:
     Raises:
         ValidationError: If the password does not meet the requirements.
     """
-    validate_requirements(password, is_valid_pswrd)
+    reqs = ["min 8 symbols, 1 digit, 1 upper, 1 lower case, 1 of @$!%*?&"]
+    try:
+        validate_requirements(password, is_valid_pswrd, reqs)
+    except ValidationError:
+        raise
