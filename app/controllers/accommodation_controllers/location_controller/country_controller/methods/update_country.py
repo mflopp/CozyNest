@@ -32,9 +32,8 @@ def update_country(country_id: int, data: dict, session: Session) -> Country:
 
             # Fetch the existing record
             country = get_country(country_id, session)
-
             # Attempt to update the record
-            Recorder.update(session, country, data)
+            Recorder.update(session, country, {field: new_name})
 
         logging.info(f"Country with ID {country_id} successfully updated.")
         return country
