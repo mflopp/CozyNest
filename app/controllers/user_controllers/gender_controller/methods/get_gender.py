@@ -37,8 +37,5 @@ def fetch_gender(
             {f"DB error occurred while querying gender by {field}: {e}"}, 500
         )
 
-    except ValidationError:
-        raise
-
-    except Exception:
+    except (ValidationError, Exception):
         raise

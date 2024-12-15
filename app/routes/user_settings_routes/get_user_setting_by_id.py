@@ -1,4 +1,5 @@
 import logging
+from sqlalchemy.exc import SQLAlchemyError
 
 from controllers import UserSettingsController
 from .user_settings_blueprint import user_settings_bp
@@ -37,12 +38,18 @@ def get_user_setting_by_id_handler(id: int):
 
         return {"message": f"User setting ID {id} not found"}, 404
 
-    except Exception as e:
-        logging.error(f"Error occurred while retrieving user setting {id}:"
-                      f"{str(e)}")
+    except SQLAlchemyError as e:
+        msg = f"Data Base error occurred while retrieving a user setting: {e}"
+        logging.error(msg, exc_info=True)
         return create_response(
-            data=[(
-                "error", f"Error finding a user setting wit ID {id}: {str(e)}"
-            )],
+            data=[("error", msg)],
+            code=400
+        )
+
+    except Exception as e:
+        msg = f"Error occurred while retrieving user setting ID {id}: {str(e)}"
+        logging.error(msg)
+        return create_response(
+            data=[("error", msg)],
             code=500
         )

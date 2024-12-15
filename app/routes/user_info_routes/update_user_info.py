@@ -2,16 +2,16 @@ from flask import request
 import logging
 from sqlalchemy.exc import SQLAlchemyError
 
-from controllers import UserController
-from .users_blueprint import users_bp
+from controllers import UserInfoController
+from .user_info_blueprint import user_info_bp
 from utils.error_handler import ValidationError
 
 from utils import create_response
 from config import session_scope
 
 
-@users_bp.route("/<int:id>", methods=['PUT'])
-def update_user_handler(id: int) -> tuple:
+@user_info_bp.route("/<int:id>", methods=['PUT'])
+def update_user_info_handler(id: int) -> tuple:
     """
     Endpoint for updating a user by ID. Receives user data in JSON format
     and updates the user's information in the database.
@@ -27,9 +27,9 @@ def update_user_handler(id: int) -> tuple:
         with session_scope() as session:
             user_data = request.get_json()
 
-            UserController.update(id, user_data, session)
+            UserInfoController.update(id, user_data, session)
 
-            msg = f"User with ID {id} updated successfully"
+            msg = f"User info with ID {id} updated successfully"
             logging.info(msg)
             return create_response(
                 data=[("message", msg)],
@@ -37,7 +37,7 @@ def update_user_handler(id: int) -> tuple:
             )
 
     except (ValueError, ValidationError) as e:
-        msg = f"Unable to update user with ID {id}: {e}"
+        msg = f"Unable to update user info with ID {id}: {e}"
         logging.error(msg)
         return create_response(
             data=[("error", msg)],
@@ -45,7 +45,7 @@ def update_user_handler(id: int) -> tuple:
         )
 
     except SQLAlchemyError as e:
-        msg = f"Data Base error occurred while updating user ID {id}: {str(e)}"
+        msg = f"DB error occurred while updating user info ID {id}: {str(e)}"
         logging.error(msg, exc_info=True)
         return create_response(
             data=[("error", msg)],
@@ -53,7 +53,7 @@ def update_user_handler(id: int) -> tuple:
         )
 
     except Exception as e:
-        msg = f"Error occurred while updating user ID {id}: {str(e)}"
+        msg = f"Error occurred while updating user info ID {id}: {str(e)}"
         logging.error(msg)
         return create_response(
             data=[("error", msg)],

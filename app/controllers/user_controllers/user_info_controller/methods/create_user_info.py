@@ -1,37 +1,90 @@
-import logging
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.sql import func
+from datetime import datetime
 
 from models import UserInfo
+from typing import Dict
+from utils import Validator, Recorder
+from utils.error_handler import ValidationError
+
+from ...gender_controller.methods import fetch_gender
+from ...user_settings_controller.methods import fetch_user_setting
 
 
-def add_user_info(user_data: dict, gender_id: int,
-                  user_settings_id: int, session: Session):
+def add_user_info(
+    user_data: Dict,
+    session: Session
+) -> UserInfo:
 
     try:
+        # set default values
+        gender_default = "Male"
+        currency_default = "USD"
+        language_default = "ENG"
+
         # Start a new transaction
         with session.begin_nested():
 
+            # getting default gender from the DB
+            # Chech if user request has information about gender
+            gender_new = user_data.get("gender", gender_default)
+
+            gender = fetch_gender(
+                'gender', {"gender": gender_new}, session
+            )
+            if not gender:
+                raise ValueError(
+                    f"Gender {gender_new} was not found in the DB"
+                )
+
+            # getting user setting from the request else setting default
+            currency_new = user_data.get("currency", currency_default)
+            language_new = user_data.get("language", language_default)
+            # validating currency and language value
+            Validator.validate_currency(currency_new)
+            Validator.validate_language(language_new)
+            user_setting_default = {
+                "currency": currency_new, "language": language_new
+            }
+            # fetching user setting from the DB
+            user_setting = fetch_user_setting(
+                user_setting_default,
+                session
+            )
+
+            if not user_setting:
+                raise ValueError(
+                    f"Default user setting {user_setting_default} was not "
+                    "found in the DB"
+                )
+
+            # Handle birthdate format
+            birthdate_new = user_data.get('birthdate', None)
+            if birthdate_new:
+                birthdate_new = datetime.strptime(
+                    birthdate_new, "%d.%m.%Y"
+                ).date()
+
             # Create UserInfo
             user_info = UserInfo(
-                gender_id=gender_id,
-                user_settings_id=user_settings_id,
+                gender_id=gender.id,
+                user_settings_id=user_setting.id,
                 first_name=user_data.get('first_name', 'first_name'),
                 last_name=user_data.get('last_name', 'last_name'),
-                birthdate=user_data.get('birthdate', None),
+                birthdate=birthdate_new,
                 created_at=func.now(),
                 updated_at=func.now()
             )
 
-            response, status = add_record(session, user_info, 'user info')
-            if status != 200:
-                logging.error(f"user info was not created, Err: {response}")
-                raise Exception(f"Failed to create user info, Err: {response}")
+            Recorder.add(session, user_info)
 
         session.flush()
-        response = user_info.id
-        return response, status
+        return user_info
+
+    except (ValidationError, ValueError, SQLAlchemyError):
+        raise
+
     except Exception as e:
-        logging.error(str(e))
-        return ({"error": "Error creating a user info", "details: ": str(e)},
-                500)
+        msg = f"Error creating a user info: {str(e)}"
+        raise Exception(msg)

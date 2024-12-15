@@ -1,6 +1,7 @@
 import logging
 from typing import Dict
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 
 from models import UserSettings
 from utils import Finder, Validator
@@ -36,5 +37,5 @@ def fetch_user_setting(data: Dict, session: Session):
 
         return user_setting
 
-    except Exception:
+    except (Exception, SQLAlchemyError):
         raise

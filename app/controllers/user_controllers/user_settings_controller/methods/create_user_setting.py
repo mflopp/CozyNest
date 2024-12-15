@@ -16,9 +16,9 @@ def add_user_setting(user_data: Dict, session: Session) -> UserSettings:
 
             # ISO 639-3 language codes are used
             fields = ['currency', 'language']
-            relevant_values = Finder.extract_required_data(fields, user_data)
 
-            Validator.validate_required_fields(fields, relevant_values)
+            Validator.validate_required_fields(fields, user_data)
+            relevant_values = Finder.extract_required_data(fields, user_data)
 
             currency = user_data.get(fields[0])
             language = user_data.get(fields[1])
@@ -41,14 +41,5 @@ def add_user_setting(user_data: Dict, session: Session) -> UserSettings:
         session.flush()
         return user_setting
 
-    except ValidationError:
-        raise
-
-    except ValueError:
-        raise
-
-    except SQLAlchemyError:
-        raise
-
-    except Exception:
+    except (ValidationError, ValueError, SQLAlchemyError, Exception):
         raise

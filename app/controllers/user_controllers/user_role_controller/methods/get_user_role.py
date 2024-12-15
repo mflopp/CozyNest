@@ -37,8 +37,5 @@ def fetch_user_role(
             500
         )
 
-    except ValidationError:
-        raise
-
-    except Exception:
+    except (Exception, ValidationError):
         raise

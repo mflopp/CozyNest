@@ -3,6 +3,7 @@ from .delete_user import del_user
 from .get_all_users import fetch_users
 from .get_user import fetch_user
 from .update_user import update_user_data
+from .get_only_user import fetch_only_user
 
 __all__ = [
     'add_user',
@@ -10,4 +11,5 @@ __all__ = [
     'fetch_users',
     'fetch_user',
     'update_user_data',
+    'fetch_only_user'
 ]

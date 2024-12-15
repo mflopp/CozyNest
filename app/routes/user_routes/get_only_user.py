@@ -3,13 +3,12 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from controllers import UserController
 from .users_blueprint import users_bp
-from collections import OrderedDict
 
 from utils import create_response
 from config import session_scope
 
 
-@users_bp.route("<int:id>", methods=['GET'])
+@users_bp.route("/only/<int:id>", methods=['GET'])
 def get_user_handler(id: int) -> tuple:
     """
     Endpoint for retrieving a user by ID. Looks up the user in the database
@@ -25,24 +24,15 @@ def get_user_handler(id: int) -> tuple:
         # Use the session_scope context manager
         with session_scope() as session:
 
-            user = UserController.get_one(id, session)
+            user = UserController.get_minimum(id, session)
             if user:
                 return create_response(data=[
                     ("user_id", user.user_id),
                     ("email", user.email),
                     # Consider excluding sensitive data (password)
                     ("password", user.password),
-                    ("first_name", user.first_name),
-                    ("last_name", user.last_name),
-                    ("birthdate", user.birthdate.strftime("%d.%m.%Y")
-                     if user.birthdate else None),
-                    ("gender", user.gender),
                     ("phone", user.phone),
                     ("role", user.user_role),
-                    ("user_settings", OrderedDict([
-                        ("currency", user.currency),
-                        ("language", user.language)
-                    ])),
                     ("deleted", user.deleted),
                     ("created_at", user.created_at),
                     ("updated_at", user.updated_at)

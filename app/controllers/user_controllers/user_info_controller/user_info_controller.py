@@ -10,15 +10,9 @@ from .methods import (
 
 class UserInfoController:
     @staticmethod
-    def create(data: Dict, session: Session) -> UserInfo:
-        user_info = add_user_info(data, session)
-        session.commit()
+    def create(user_data: Dict, session: Session) -> UserInfo:
+        user_info = add_user_info(user_data, session)
         return user_info
-
-    # @staticmethod
-    # def get_one_by_name(data: Dict, session: Session) -> Userinfos:
-    #     user_info = fetch_user_info(data, session)
-    #     return user_info
 
     @staticmethod
     def get_one(user_info_id: int, session: Session) -> UserInfo:

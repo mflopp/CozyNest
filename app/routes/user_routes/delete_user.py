@@ -1,4 +1,5 @@
 import logging
+from sqlalchemy.exc import SQLAlchemyError
 
 from controllers import UserController
 from .users_blueprint import users_bp
@@ -25,9 +26,19 @@ def delete_user_handler(id: int) -> list:
             response, status = UserController.delete(id, session)
 
             return response, status
-    except Exception as e:
-        logging.error(f"Error occurred while deleting user {id}: {str(e)}")
+
+    except SQLAlchemyError as e:
+        msg = f"Data Base error occurred while deleting user ID {id}: {str(e)}"
+        logging.error(msg, exc_info=True)
         return create_response(
-            data=[("error", f"Error deleting user: {str(e)}")],
+            data=[("error", msg)],
+            code=400
+        )
+
+    except Exception as e:
+        msg = f"Error occurred while deleting user ID {id}: {str(e)}"
+        logging.error(msg)
+        return create_response(
+            data=[("error", msg)],
             code=500
         )

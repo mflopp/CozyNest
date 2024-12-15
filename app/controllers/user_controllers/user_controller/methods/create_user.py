@@ -1,13 +1,14 @@
 import logging
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
-from models import User, Gender
+from sqlalchemy.exc import SQLAlchemyError
 
-from controllers.user_controllers.user_settings_controller.methods import fetch_user_setting
-# from controllers.user_controllers.user_info_controller_methods import add_user_info
-from controllers.user_controllers.user_role_controller.methods import fetch_user_role
-
+from models import User
+from utils import Validator, Recorder, Finder
 from utils.error_handler import ValidationError
+
+from ...user_info_controller.methods import add_user_info
+from ...user_role_controller.methods import fetch_user_role
 
 
 def add_user(user_data: dict, session: Session):
@@ -15,63 +16,67 @@ def add_user(user_data: dict, session: Session):
     try:
         # Start a new transaction
         with session.begin_nested():
-        
+
             # validating fields
             fields = ['email', 'password', 'phone']
-
-            validate_data(
-                session=session,
-                Model=User,
-                data=user_data,
-                required_fields=fields,
-                unique_fields=['email', 'phone']
+            Validator.validate_required_fields(fields, user_data)
+            relevant_values = Finder.extract_required_data(fields, user_data)
+            print(f"\033[34m ############# relevant_values: {relevant_values}\033[0m")
+            Validator.validate_email(relevant_values['email'])
+            # print("\033[34m ############# email validation: \033[0m")
+            Validator.validate_pswrd(relevant_values['password'])
+            # print("\033[34m ############# password validation: \033[0m")
+            Validator.validate_phone(relevant_values['phone'])
+            Validator.validate_uniqueness(
+                session, User, {'email': user_data.get('email')}
+            )
+            Validator.validate_uniqueness(
+                session, User, {'phone': user_data.get('phone')}
             )
 
-            gender_pre = "Male"
-
-            # Find or create gender before any commits
-            gender = get_first_record_by_criteria(
-                session, Gender, {"gender": gender_pre}
+            logging.info(
+                'All validations succesfully passed!'
             )
-
-            # getting UserSettings with default values
-            user_settings = {"currency": "USD", "language": "ENG"}
-            user_setting = fetch_user_setting(user_settings, session)
-            if not user_setting:
-                logging.error(f"Error: Default user setitng was not found in the DB: {user_settings}")
-                raise ValueError("Failed to get default user settings from the DB")
 
             # Create UserInfo
-            response, status = add_user_info(user_data, gender.id, user_setting.id, session)
-            if status != 200:
-                logging.error(f"user info was not created, Error: {response}")
-                raise ValueError(f"Failed to create user info, Error: {response}")
+            user_info = add_user_info(
+                user_data,
+                session
+            )
+            print(f"\033[34m ############# user_info created: {user_info}\033[0m")
 
-            user_role = fetch_user_role({"role": 'User'}, session)
+            # getting default user role from the DB
+            user_role_default = "User"
+            user_role = fetch_user_role(
+                'role',
+                {'role': user_role_default},
+                session
+            )
+
             if not user_role:
-                logging.error("User role was not provided")
-                raise ValueError(f"Failed to add user role")
+                raise ValueError(
+                    f"Default user role {user_role_default} was not found "
+                    "in the DB"
+                )
+            print(f"\033[34m ############# user_role created: {user_info}\033[0m")
 
             # Create the user
             user = User(
                 role_id=user_role.id,
-                info_id=response,
-                email=user_data['email'],
-                password=user_data['password'],
-                phone=user_data['phone'],
+                info_id=user_info.id,
+                email=relevant_values['email'],
+                password=relevant_values['password'],
+                phone=relevant_values['phone'],
                 created_at=func.now(),
                 updated_at=func.now()
             )
 
-            add_record(session, user, 'user')
+            Recorder.add(session, user)
 
         # commit the transaction after 'with' block
-        session.flush()            
+        session.flush()
         logging.info(f"User created successfully with ID {user.id}")
         return user
-    
-    except ValidationError:
-        raise
-    except (ValueError, Exception) as e:
-        logging.error(f"Error creating user: {str(e)}")
+
+    except (ValidationError, ValueError, SQLAlchemyError, Exception):
         raise

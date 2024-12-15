@@ -1,5 +1,6 @@
 from flask import request
 import logging
+from sqlalchemy.exc import SQLAlchemyError
 
 from controllers import UserController
 from utils.error_handler import ValidationError
@@ -37,16 +38,36 @@ def create_user_handler() -> tuple:
                 code=200
             )
 
-    except ValidationError as err:
-        logging.error(f"Error occurred while creating country: {str(err)}")
+    except ValidationError as e:
+        # creating validation error message
+        msg = f"Validation error while creating a user: {str(e)}"
+        logging.error(msg)
+
+        # Returning validation error response
         return create_response(
-            data=[("error", str(err))],
+            data=[("error", msg)],
+            code=400
+        )
+
+    except ValueError as e:
+        logging.error(str(e), exc_info=True)
+        return create_response(
+            data=[("error", str(e))],
+            code=400
+        )
+
+    except SQLAlchemyError as e:
+        msg = f"Data Base error occurred while creating a user: {e}"
+        logging.error(msg, exc_info=True)
+        return create_response(
+            data=[("error", msg)],
             code=400
         )
 
     except Exception as e:
-        logging.error(f"Error occurred while creating user: {str(e)}")
+        msg = f"Error occurred while creating a user: {str(e)}"
+        logging.error(msg)
         return create_response(
-            data=[("error", f"Error creating user: {str(e)}")],
+            data=[("error", msg)],
             code=500
         )
