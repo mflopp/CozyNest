@@ -22,10 +22,24 @@ def add_user_info(
         gender_default = "Male"
         currency_default = "USD"
         language_default = "ENG"
+        first_name_default = "first_name"
+        last_name_default = "last_name"
 
         # Start a new transaction
         with session.begin_nested():
 
+            # getting first and last name from the request
+            first_name = user_data.get("first_name")
+            last_name = user_data.get("last_name")
+            # validating first and last names
+            if first_name:
+                Validator.validate_name(first_name)
+            else:
+                first_name = first_name_default
+            if last_name:
+                Validator.validate_name(last_name)
+            else:
+                last_name = last_name_default
             # getting default gender from the DB
             # Chech if user request has information about gender
             gender_new = user_data.get("gender", gender_default)
@@ -70,8 +84,8 @@ def add_user_info(
             user_info = UserInfo(
                 gender_id=gender.id,
                 user_settings_id=user_setting.id,
-                first_name=user_data.get('first_name', 'first_name'),
-                last_name=user_data.get('last_name', 'last_name'),
+                first_name=first_name,
+                last_name=last_name,
                 birthdate=birthdate_new,
                 created_at=func.now(),
                 updated_at=func.now()
