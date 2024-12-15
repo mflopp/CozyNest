@@ -7,6 +7,9 @@ from models import Country
 from utils import Validator, Recorder
 from utils.error_handler import ValidationError
 
+ERR_MSG = "Error occurred while Country record creating"
+TRACEBACK = True
+
 
 def create_country(data: Dict, session: Session) -> Country:
     try:
@@ -16,21 +19,17 @@ def create_country(data: Dict, session: Session) -> Country:
 
             name = data.get(field)
 
-            Validator.validate_unique_fields(
+            Validator.validate_uniqueness(
                 session=session,
                 Model=Country,
-                fields_values={field: name}
+                criteria={field: name}
             )
 
             Validator.validate_name(name)
 
-            logging.info('Given country name passed all validations!')
-
             new_country = Country(name=name)
             if not new_country:
-                raise SQLAlchemyError('Country creation error')
-
-            logging.info('Country object succesfully initialized!')
+                raise SQLAlchemyError
 
             Recorder.add(session, new_country)
 
@@ -38,28 +37,24 @@ def create_country(data: Dict, session: Session) -> Country:
 
     except ValidationError as e:
         logging.error(
-            {f"Validation error occurred while creating: {e}"},
-            exc_info=True
+            f"Validation {ERR_MSG}: {e}", exc_info=TRACEBACK
         )
         raise
 
     except ValueError as e:
         logging.error(
-            f"Value Error occured while creating: {e}",
-            exc_info=True
+            f"Value {ERR_MSG}: {e}", exc_info=TRACEBACK
         )
         raise
 
     except SQLAlchemyError as e:
         logging.error(
-            {f"Data Base error occurred while creating: {e}"},
-            exc_info=True
+            f"Data Base {ERR_MSG}: {e}", exc_info=TRACEBACK
         )
         raise
 
     except Exception as e:
         logging.error(
-            {f"Unexpected error while creating: {e}"},
-            exc_info=True
+            f"Unexpected {ERR_MSG}: {e}", exc_info=TRACEBACK
         )
         raise

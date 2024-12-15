@@ -1,4 +1,6 @@
 import re
+from utils.error_handler import ValidationError
+
 from .validate_requirements import validate_requirements
 
 
@@ -13,4 +15,7 @@ def is_valid_currency(currency: str) -> bool:
 
 
 def validate_currency(currency: str) -> None:
-    validate_requirements(currency, is_valid_currency, ["XXX"])
+    try:
+        validate_requirements(currency, is_valid_currency, ["XXX"])
+    except ValidationError:
+        raise

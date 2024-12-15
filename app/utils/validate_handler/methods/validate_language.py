@@ -1,4 +1,6 @@
 import re
+from utils.error_handler import ValidationError
+
 from .validate_requirements import validate_requirements
 
 
@@ -32,4 +34,7 @@ def validate_language(language: str) -> None:
     Raises:
         ValidationError: If the language is invalid.
     """
-    validate_requirements(language, is_valid_language, ["XXX"])
+    try:
+        validate_requirements(language, is_valid_language, ["XXX"])
+    except ValidationError:
+        raise

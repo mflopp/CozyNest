@@ -58,27 +58,19 @@ def delete_user_setting_handler(id: int) -> tuple:
         )
 
     except SQLAlchemyError as e:
-        logging.error(
-            {f"Data Base error occurred while deleting: {e}"},
-            exc_info=True
+        msg = (
+            f"DB error occurred while deleting user setting ID {id}: {str(e)}"
         )
+        logging.error(msg, exc_info=True)
         return create_response(
-            data=[(
-                "error",
-                f"DB error occurred while deleting user setting with ID {id}: "
-                f"{str(e)}"
-            )],
+            data=[("error", msg)],
             code=500
         )
 
     except Exception as e:
-        logging.error(
-            f"Error occurred while deleting user setting {id}: {str(e)}"
-        )
+        msg = f"Error deleting user setting with ID {id}: {str(e)}"
+        logging.error(msg)
         return create_response(
-            data=[(
-                "error",
-                f"Error deleting user setting with ID {id}: {str(e)}"
-            )],
+            data=[("error", msg)],
             code=500
         )

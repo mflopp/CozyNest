@@ -55,28 +55,17 @@ def delete_gender_handler(id: int) -> tuple:
         )
 
     except SQLAlchemyError as e:
-        logging.error({
-            f"Data Base error occurred while deleting gender with ID {id}: {e}"
-        },
-            exc_info=True
-        )
+        msg = f"DB error occurred while deleting gender with ID {id}: {e}"
+        logging.error(msg, exc_info=True)
         return create_response(
-            data=[(
-                "error",
-                f"DB error occurred while deleting gender with ID {id}: "
-                f"{str(e)}"
-            )],
+            data=[("error", msg)],
             code=500
         )
 
     except Exception as e:
-        logging.error(
-            f"Error occurred while deleting gender with ID {id}: {str(e)}"
-        )
+        msg = f"Error occurred while deleting gender with ID {id}: {str(e)}"
+        logging.error(msg)
         return create_response(
-            data=[(
-                "error",
-                f"Error deleting gender with ID {id}: {str(e)}"
-            )],
+            data=[("error", msg)],
             code=500
         )

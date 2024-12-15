@@ -6,26 +6,29 @@ from utils import Finder
 from utils.error_handler import ValidationError
 
 
-def validate_unique_fields(
+def validate_uniqueness(
     session: Session,
     Model: Type[Any],
-    fields_values: Dict[str, Any]
+    criteria: Dict[str, Any]
 ) -> None:
     try:
+        logging.info("Validation of unique values started")
+
         record = Finder.fetch_record(
             session=session,
             Model=Model,
-            criteria=fields_values
+            criteria=criteria
         )
 
         if record:
-            msg = f"Duplicate record found with values: {fields_values}."
+            msg = f"Duplicate record found with values: {criteria}."
             logging.warning(msg)
             raise ValidationError(msg)
         else:
             logging.info(
                 "No duplicate record found with the given combination "
-                f"of values {fields_values}"
+                f"of values {criteria}"
             )
+
     except ValidationError:
         raise

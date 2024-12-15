@@ -5,13 +5,13 @@ import logging
 from models.users import User, UserInfo, UserRole, Gender, UserSettings
 
 
-def fetch_user(id: int, db: Session) -> dict:
+def fetch_user(id: int, session: Session) -> dict:
     """
     Fetches user data from the database by ID, including related information.
 
     Args:
         id (int): User ID.
-        db (Session): SQLAlchemy database session.
+        session (Session): SQLAlchemy database session.
 
     Returns:
         dict: User data including personal details, role, and settings.
@@ -22,7 +22,7 @@ def fetch_user(id: int, db: Session) -> dict:
     """
     try:
         # Query user and related data
-        user = db.query(
+        user = session.query(
             User.id.label("user_id"),
             User.email,
             User.password,
@@ -51,9 +51,6 @@ def fetch_user(id: int, db: Session) -> dict:
         logging.info(f"User found with ID {id}")
 
         return user
-    except SQLAlchemyError as e:
-        logging.error(f"Database error: {e}")
-        raise
-    except Exception as e:
-        logging.error(str(e))
+
+    except (Exception, SQLAlchemyError):
         raise

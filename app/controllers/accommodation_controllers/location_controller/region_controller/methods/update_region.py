@@ -21,7 +21,7 @@ def update_region(region_id: int, data: dict, session: Session) -> Region:
             Validator.validate_name(new_name)
 
             # Fetch the existing record
-            region = get_region('id', region_id, session)
+            region = get_region(region_id, session)
 
             # Attempt to update the record
             Recorder.update(session, region, data)

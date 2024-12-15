@@ -9,7 +9,7 @@ from .validate_required_fields import validate_required_field
 
 from .validate_requirements import validate_requirements
 from .validate_unique_field import validate_unique_field
-from .validate_unique_fields import validate_unique_fields
+from .validate_unique_fields import validate_uniqueness
 
 from .validate_geografic_name import validate_geografic_name
 from .validate_name import validate_name
@@ -28,7 +28,7 @@ __all__ = [
 
     'validate_requirements',
     'validate_unique_field',
-    'validate_unique_fields',
+    'validate_uniqueness',
 
     'validate_geografic_name',
     'validate_name',

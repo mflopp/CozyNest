@@ -6,6 +6,8 @@ from models import Country
 from utils import Finder, Validator
 from utils.error_handler import ValidationError, NoRecordsFound
 
+ERR_MSG = "Error occurred while fetching Country record"
+
 
 def get_country(id: int, session: Session) -> Country:
     try:
@@ -24,29 +26,23 @@ def get_country(id: int, session: Session) -> Country:
         raise NoRecordsFound
 
     except NoRecordsFound as e:
-        logging.error(
-            {f"No Records Found occurred while fetching Country: {e}"},
-            exc_info=True
-        )
+        logging.error(e, exc_info=True)
         raise
 
     except ValidationError as e:
         logging.error(
-            {f"Validation error occurred while fetching Country: {e}"},
-            exc_info=True
+            f"Validation {ERR_MSG}: {e}", exc_info=True
         )
         raise
 
     except SQLAlchemyError as e:
         logging.error(
-            {f"DB error occurred while fetching Country: {e}"},
-            exc_info=True
+            f"Data Base {ERR_MSG}: {e}", exc_info=True
         )
         raise
 
     except Exception as e:
         logging.error(
-            {f"Unexpected error while fetching Country: {e}"},
-            exc_info=True
+            f"Unexpected {ERR_MSG}: {e}", exc_info=True
         )
         raise

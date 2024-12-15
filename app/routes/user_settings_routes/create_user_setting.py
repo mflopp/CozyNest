@@ -40,40 +40,36 @@ def create_user_setting_handler() -> Dict:
             )
 
     except ValidationError as e:
+        msg = f"Validation error while creating a user setting: {str(e)}"
         # Logging validation error
-        logging.error(
-            f"Validation error while creating a user setting: {str(e)}"
-        )
+        logging.error(msg)
 
         # Returning validation error response
         return create_response(
-            data=[("error", str(e))],
+            data=[("error", msg)],
             code=400
         )
 
     except ValueError as e:
-        logging.error(
-            f"Value Error occured while creating a user setting: {e}",
-            exc_info=True
-        )
+        msg = f"Value Error occured while creating a user setting: {e}"
+        logging.error(msg, exc_info=True)
         return create_response(
-            data=[("error", str(e))],
+            data=[("error", msg)],
             code=400
         )
 
     except SQLAlchemyError as e:
-        logging.error(
-            {f"Data Base error occurred while creating a user setting: {e}"},
-            exc_info=True
-        )
+        msg = f"Data Base error occurred while creating a user setting: {e}"
+        logging.error(msg, exc_info=True)
         return create_response(
-            data=[("error", str(e))],
+            data=[("error", msg)],
             code=400
         )
 
     except Exception as e:
-        logging.error(f"Error occurred while creating user setting: {str(e)}")
+        msg = f"Error occurred while creating user a setting: {str(e)}"
+        logging.error(msg)
         return create_response(
-            data=[("error", f"Error creating a user setting: {str(e)}")],
+            data=[("error", msg)],
             code=500
         )

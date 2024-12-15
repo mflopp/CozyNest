@@ -1,8 +1,10 @@
 from flask import request
 import logging
+from sqlalchemy.exc import SQLAlchemyError
 
 from controllers import UserController
 from .users_blueprint import users_bp
+from utils.error_handler import ValidationError
 
 from utils import create_response
 from config import session_scope
@@ -24,21 +26,36 @@ def update_user_handler(id: int) -> tuple:
         # Use the session_scope context manager
         with session_scope() as session:
             user_data = request.get_json()
-            response = UserController.update(id, user_data, session)
+
+            UserController.update(id, user_data, session)
+
+            msg = f"User with ID {id} updated successfully"
+            logging.info(msg)
             return create_response(
-                data=[("user", response)],
+                data=[("message", msg)],
                 code=200
             )
 
-    except ValueError as value_error:
+    except (ValueError, ValidationError) as e:
+        msg = f"Unable to update user with ID {id}: {e}"
+        logging.error(msg)
         return create_response(
-            data=[("error", str(value_error))],
+            data=[("error", msg)],
             code=500
         )
 
-    except Exception as e:
-        logging.error(f"Error occurred while updating user ID {id}: {str(e)}")
+    except SQLAlchemyError as e:
+        msg = f"Data Base error occurred while updating user ID {id}: {str(e)}"
+        logging.error(msg, exc_info=True)
         return create_response(
-            data=[("error", f"Error updating user ID {id}: {str(e)}")],
+            data=[("error", msg)],
+            code=400
+        )
+
+    except Exception as e:
+        msg = f"Error occurred while updating user ID {id}: {str(e)}"
+        logging.error(msg)
+        return create_response(
+            data=[("error", msg)],
             code=500
         )

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from models import UserSettings
 from .methods import (
     add_user_setting, del_user_setting, fetch_user_settings,
-    fetch_user_setting, fetch_user_setting_by_id, update_user_setting
+    fetch_user_setting, fetch_user_setting_by_id
 )
 
 
@@ -35,8 +35,8 @@ class UserSettingsController:
         session.commit()
         return result
 
-    @staticmethod
-    def update(user_id: int, data: Dict, session: Session) -> List:
-        result = update_user_setting(user_id, data, session)
-        session.commit()
-        return result
+    # @staticmethod
+    # def update(user_id: int, data: Dict, session: Session) -> List:
+    #     result = update_user_setting(user_id, data, session)
+    #     session.commit()
+    #     return result

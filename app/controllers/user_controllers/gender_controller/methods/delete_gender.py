@@ -38,7 +38,7 @@ def del_gender(id: int, session: Session):
 
         # commit the transaction after 'with' block
         session.flush()
-        logging.info(f"Gender ID:{id} deleted successfully")
+        logging.info(f"Gender ID {id} deleted successfully")
 
     except NoRecordsFound:
         raise

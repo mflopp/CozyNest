@@ -1,7 +1,10 @@
 from flask import request
 import logging
+from sqlalchemy.exc import SQLAlchemyError
+
 from controllers import UserSettingsController
 from .user_settings_blueprint import user_settings_bp
+
 from utils import create_response
 from config import session_scope
 
@@ -9,7 +12,7 @@ from config import session_scope
 @user_settings_bp.route("/getone", methods=['GET'])
 def get_user_setting_handler():
     """
-    Endpoint for retrieving a user setting by ID. Looks up the user
+    Endpoint for retrieving a user setting. Looks up the user
     in the database and returns the user setting data or a 404 error
     if not found.
 
@@ -38,10 +41,19 @@ def get_user_setting_handler():
                 )
 
         return {"message": "User setting not found"}, 404
-    except Exception as e:
-        logging.error(f"Error occurred while retrieving user setting:"
-                      f"{str(e)}")
+
+    except SQLAlchemyError as e:
+        msg = f"Data Base error occurred while retrieving a user setting: {e}"
+        logging.error(msg, exc_info=True)
         return create_response(
-            data=[("error", f"Error finding a user setting: {str(e)}")],
+            data=[("error", msg)],
+            code=400
+        )
+
+    except Exception as e:
+        msg = f"Error occurred while retrieving a user setting: {str(e)}"
+        logging.error(msg)
+        return create_response(
+            data=[("error", msg)],
             code=500
         )

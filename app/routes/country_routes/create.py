@@ -13,11 +13,15 @@ from config import session_scope
 @country_bp.route("", methods=['POST'])
 def create_country_handler() -> Response:
     try:
+        request_data = request.get_json()
+        if not request_data:
+            return create_response(
+                data=[("error", "Request body is required")],
+                code=400
+            )
+
         # Using session_scope context manager for database session
         with session_scope() as session:
-            # Extracting data from the request
-            request_data = request.get_json()
-
             # Creating the country via the controller
             country = CountryController.create(request_data, session)
             if country:

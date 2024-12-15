@@ -1,4 +1,5 @@
 import logging
+from sqlalchemy.exc import SQLAlchemyError
 
 from controllers import UserController
 from .users_blueprint import users_bp
@@ -51,9 +52,18 @@ def get_user_handler(id: int) -> tuple:
 
             return {"error": f"User ID {id} not found"}, 404
 
-    except Exception as e:
-        logging.error(f"Error occurred while retrieving user {id}: {str(e)}")
+    except SQLAlchemyError as e:
+        msg = f"Data Base error occurred while getting user ID {id}: {str(e)}"
+        logging.error(msg, exc_info=True)
         return create_response(
-            data=[("error", f"Error finding user: {str(e)}")],
+            data=[("error", msg)],
+            code=400
+        )
+
+    except Exception as e:
+        msg = f"Error occurred while getting a user ID {id}: {str(e)}"
+        logging.error(msg)
+        return create_response(
+            data=[("error", msg)],
             code=500
         )

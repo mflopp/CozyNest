@@ -1,4 +1,4 @@
-from .region_controller import RegionController
+from .RegionController import RegionController
 
 __all__ = [
     'RegionController'

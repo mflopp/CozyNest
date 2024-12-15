@@ -5,12 +5,9 @@ from typing import Type, Any, Dict
 
 def update_record(session: Session, record: Type[Any], new_data: Dict):
     try:
+        logging.info("Record updating started!")
         entity = record.__tablename__
 
-        if not record:
-            error_message = f"Record not found in {entity}"
-            logging.error(error_message)
-            return {"error": error_message}, 404
         # Attempt to delete the record
         with session.begin_nested():
 
@@ -21,12 +18,12 @@ def update_record(session: Session, record: Type[Any], new_data: Dict):
 
             session.flush()
 
-            log_message = f"{record.id} successfully updated from {entity}"
-            success_message = f"{entity} was updated."
+            message = f"Record with ID = {record.id} successfully updated"
 
-        logging.info(log_message)
-        return {"message": success_message, "id": record.id}, 200
+        logging.info(message)
+
     except Exception as e:
         error_message = f"Failed to update record from {entity}"
         logging.error(f"{error_message}: {str(e)}")
-        raise Exception(f"error: {error_message}, details: {str(e)}")
+
+        raise Exception(f"{error_message}: {str(e)}")

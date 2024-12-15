@@ -10,7 +10,7 @@ from .methods import (
     validate_required_fields,
     validate_required_field,
     validate_unique_field,
-    validate_unique_fields,
+    validate_uniqueness,
     validate_geografic_name,
     validate_name,
     validate_id
@@ -26,31 +26,31 @@ class Validator:
         validate_id(id)
 
     @staticmethod
-    def validate_geografic_name(name: str) -> None:
+    def validate_geografic_name(name: Any) -> None:
         validate_geografic_name(name)
 
     @staticmethod
-    def validate_name(name: str | Any | None) -> None:
+    def validate_name(name: Any) -> None:
         validate_name(name)
 
     @staticmethod
-    def validate_currency(currency: str) -> None:
+    def validate_currency(currency: Any) -> None:
         validate_currency(currency)
 
     @staticmethod
-    def validate_email(email: str) -> None:
+    def validate_email(email: Any) -> None:
         validate_email(email)
 
     @staticmethod
-    def validate_language(language: str) -> None:
+    def validate_language(language: Any) -> None:
         validate_language(language)
 
     @staticmethod
-    def validate_phone(phone: str) -> None:
+    def validate_phone(phone: Any) -> None:
         validate_phone(phone)
 
     @staticmethod
-    def validate_pswrd(password: str) -> None:
+    def validate_pswrd(password: Any) -> None:
         validate_password(password)
 
     @staticmethod
@@ -77,9 +77,9 @@ class Validator:
         validate_unique_field(session, Model, field, value)
 
     @staticmethod
-    def validate_unique_fields(
+    def validate_uniqueness(
         session: Session,
         Model: Type[Any],
-        fields_values: Dict[str, Any]
+        criteria: Dict[str, Any]
     ) -> None:
-        validate_unique_fields(session, Model, fields_values)
+        validate_uniqueness(session, Model, criteria)

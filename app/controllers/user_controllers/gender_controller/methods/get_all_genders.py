@@ -8,6 +8,7 @@ from utils import Finder
 def fetch_genders(session: Session):
 
     try:
+        # Fetch all genders records
         genders = Finder.fetch_records(session, Gender)
 
         return genders

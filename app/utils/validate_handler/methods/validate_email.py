@@ -1,4 +1,6 @@
 import re
+from utils.error_handler import ValidationError
+
 from .validate_requirements import validate_requirements
 
 
@@ -35,4 +37,7 @@ def validate_email(email: str) -> None:
     Raises:
         ValidationError: If the email address is invalid.
     """
-    validate_requirements(email, is_valid_email)
+    try:
+        validate_requirements(email, is_valid_email, ["name@server.domain"])
+    except ValidationError:
+        raise

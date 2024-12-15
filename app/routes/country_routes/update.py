@@ -1,10 +1,13 @@
-from flask import request, Response
 import logging
+from flask import Response, request
+from sqlalchemy.exc import SQLAlchemyError
 
 from controllers import CountryController
-from .countries_blueprint import country_bp
+from utils.error_handler import ValidationError, NoRecordsFound
+
 from utils import create_response
 from config import session_scope
+from .countries_blueprint import country_bp
 
 
 @country_bp.route("/<int:id>", methods=['PUT'])
@@ -26,21 +29,51 @@ def update_country_handler(id: int) -> Response:
                 code=200
             )
 
-    except KeyError as e:
+    except ValidationError as e:
+        # Logging validation error
+        logging.error(f"Validation Error occurred while updating: {str(e)}")
+
+        # Returning validation error response
+        return create_response(
+            data=[("error", str(e))],
+            code=400
+        )
+
+    except ValueError as e:
         logging.error(
-            f"Key error occurred while updating country ID {id}: {str(e)}",
+            f"Value Error occured while updating: {str(e)}",
+            exc_info=True
+        )
+        # Returning validation error response
+        return create_response(
+            data=[("error", str(e))],
+            code=400
+        )
+
+    except NoRecordsFound as e:
+        msg = f"No records found to update with ID {id}"
+        logging.error(f"{msg}: {str(e)}", exc_info=True)
+
+        return create_response(
+            data=[("error", msg)],
+            code=404
+        )
+
+    except SQLAlchemyError as e:
+        logging.error(
+            {f"Data Base error occurred while updating: {e}"},
             exc_info=True
         )
         return create_response(
-            data=[("error", "Invalid data format or missing fields")],
+            data=[("error", str(e))],
             code=400
         )
 
     except Exception as e:
-        logging.error(
-            f"Unexpected error occurred while updating country: {str(e)}",
-            exc_info=True
-        )
+        # Logging unexpected error with traceback
+        logging.error(f"Error occurred while updating country data: {str(e)}")
+
+        # Returning general error response
         return create_response(
             data=[("error", "Error updating country data")],
             code=500

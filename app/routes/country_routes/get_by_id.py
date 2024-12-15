@@ -10,7 +10,7 @@ from .countries_blueprint import country_bp
 
 
 @country_bp.route("/<int:id>", methods=['GET'])
-def get_country_by_id_handler(id: int) -> Response:
+def get_country_handler(id: int) -> Response:
     try:
         with session_scope() as session:
             country = CountryController.get_country(id, session)

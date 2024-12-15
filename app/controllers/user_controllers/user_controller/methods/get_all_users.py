@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 import logging
-from flask import abort
 
 from models.users import User, UserInfo, UserRole, Gender, UserSettings
+
 
 def fetch_users(db: Session):
     try:
@@ -27,11 +28,11 @@ def fetch_users(db: Session):
          .join(UserRole, User.role_id == UserRole.id)\
          .join(UserSettings, UserInfo.user_settings_id == UserSettings.id)\
          .all()
-         
+
         if not users:
-            logging.info(f"Users not found in the DB")
+            logging.info("Users not found in the DB")
             return False
-        
+
         # Transform data to the desired format
         user_data = [
             {
@@ -57,6 +58,6 @@ def fetch_users(db: Session):
 
         logging.info(f"{len(user_data)} users found in the DB")
         return user_data
-    except Exception as e:
-        logging.error(str(e))
+
+    except (Exception, SQLAlchemyError):
         raise

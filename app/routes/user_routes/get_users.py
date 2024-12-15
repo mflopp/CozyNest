@@ -1,4 +1,5 @@
 import logging
+from sqlalchemy.exc import SQLAlchemyError
 
 from controllers import UserController
 from .users_blueprint import users_bp
@@ -29,9 +30,18 @@ def get_users_handler() -> list:
 
             return "Users not found", 404
 
-    except Exception as e:
-        logging.error(f"Error occurred while retrieving users: {str(e)}")
+    except SQLAlchemyError as e:
+        msg = f"Data Base error occurred while getting users: {str(e)}"
+        logging.error(msg, exc_info=True)
         return create_response(
-            data=[("error", f"Error finding users: {str(e)}")],
+            data=[("error", msg)],
+            code=400
+        )
+
+    except Exception as e:
+        msg = f"Error occurred while getting users: {str(e)}"
+        logging.error(msg)
+        return create_response(
+            data=[("error", msg)],
             code=500
         )
