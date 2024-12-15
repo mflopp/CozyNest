@@ -7,6 +7,7 @@ from utils import Finder, Validator
 from utils.error_handler import ValidationError, NoRecordsFound
 
 ERR_MSG = "Error occurred while fetching Region record"
+TRACEBACK = True
 
 
 def get_region(id: int, session: Session) -> Region:
@@ -26,23 +27,23 @@ def get_region(id: int, session: Session) -> Region:
         raise NoRecordsFound
 
     except NoRecordsFound as e:
-        logging.error(e, exc_info=True)
+        logging.error(e, exc_info=TRACEBACK)
         raise
 
     except ValidationError as e:
         logging.error(
-            f"Validation {ERR_MSG}: {e}", exc_info=True
+            f"Validation {ERR_MSG}: {e}", exc_info=TRACEBACK
         )
         raise
 
     except SQLAlchemyError as e:
         logging.error(
-            f"Data Base {ERR_MSG}: {e}", exc_info=True
+            f"Data Base {ERR_MSG}: {e}", exc_info=TRACEBACK
         )
         raise
 
     except Exception as e:
         logging.error(
-            f"Unexpected {ERR_MSG}: {e}", exc_info=True
+            f"Unexpected {ERR_MSG}: {e}", exc_info=TRACEBACK
         )
         raise
