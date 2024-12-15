@@ -4,6 +4,7 @@ from models import Region
 from .methods import (
     create_region,
     get_region,
+    get_full_region,
     get_regions,
     delete_region,
     update_region
@@ -20,7 +21,11 @@ class RegionController:
     @staticmethod
     def get_region(region_id: int, session: Session) -> Region:
         result = get_region(region_id, session)
-        session.commit()
+        return result
+
+    @staticmethod
+    def get_full_region(region_id: int, session: Session) -> Dict:
+        result = get_full_region(region_id, session)
         return result
 
     @staticmethod
