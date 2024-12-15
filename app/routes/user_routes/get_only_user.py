@@ -9,7 +9,7 @@ from config import session_scope
 
 
 @users_bp.route("/only/<int:id>", methods=['GET'])
-def get_user_handler(id: int) -> tuple:
+def get_only_user_handler(id: int) -> tuple:
     """
     Endpoint for retrieving a user by ID. Looks up the user in the database
     and returns the user data or a 404 error if not found.
@@ -27,12 +27,12 @@ def get_user_handler(id: int) -> tuple:
             user = UserController.get_minimum(id, session)
             if user:
                 return create_response(data=[
-                    ("user_id", user.user_id),
+                    ("user_id", user.id),
                     ("email", user.email),
                     # Consider excluding sensitive data (password)
                     ("password", user.password),
                     ("phone", user.phone),
-                    ("role", user.user_role),
+                    ("role", user.role_id),
                     ("deleted", user.deleted),
                     ("created_at", user.created_at),
                     ("updated_at", user.updated_at)
