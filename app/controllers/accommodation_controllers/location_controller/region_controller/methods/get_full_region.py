@@ -4,19 +4,16 @@ from sqlalchemy.exc import SQLAlchemyError
 from typing import Dict
 
 from .get_region import get_region
-# from controllers import CountryController
-
 from utils.error_handler import ValidationError, NoRecordsFound
+
+ERR_MSG = "Error occurred while fetching Region record"
+TRACEBACK = True
 
 
 def get_full_region(id: int, session: Session) -> Dict:
     try:
-        if not isinstance(id, int):
-            raise ValidationError("ID must be integer")
-
         # Retrieve the record
-        region = get_region('id', id, session)
-        # country = CountryController.get_one_by_id(region.country_id, session)
+        region = get_region(id, session)
 
         full_record = {
             'id': region.id,
@@ -27,29 +24,23 @@ def get_full_region(id: int, session: Session) -> Dict:
         return full_record
 
     except NoRecordsFound as e:
-        logging.warning(
-            {f"No records found: {e}"},
-            exc_info=True
-        )
+        logging.error(e, exc_info=TRACEBACK)
         raise
 
     except ValidationError as e:
         logging.error(
-            {f"Validation Error occurred while fetching record: {e}"},
-            exc_info=True
+            f"Validation {ERR_MSG}: {e}", exc_info=TRACEBACK
         )
         raise
 
     except SQLAlchemyError as e:
         logging.error(
-            {f"Data Base error occurred while fetching record: {e}"},
-            exc_info=True
+            f"Data Base {ERR_MSG}: {e}", exc_info=TRACEBACK
         )
         raise
 
     except Exception as e:
         logging.error(
-            {f"Unexpected error occurred while fetching record: {e}"},
-            exc_info=True
+            f"Unexpected {ERR_MSG}: {e}", exc_info=TRACEBACK
         )
         raise
