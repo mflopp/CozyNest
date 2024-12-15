@@ -28,7 +28,7 @@ def update_user_info(
             fields = ['first_name', 'last_name']
             relevant_fields = Finder.extract_required_data(fields, user_data)
             for value in relevant_fields.values():
-                Validator.validate_name(value, relevant_fields)
+                Validator.validate_name(value)
 
             user_info.first_name = user_data.get(
                 'first_name', user_info.first_name
@@ -64,7 +64,7 @@ def update_user_info(
             # update user_settings_id with a new user_setting_id
             if user_setting_id:
                 user_info.user_settings_id = user_setting_id
-            
+
             # Block 2: update gender
             # Fetch new gender
             gender_id = get_updated_gender(user_data, session)
