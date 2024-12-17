@@ -21,7 +21,6 @@ class CountryController:
     @staticmethod
     def get_country(country_id: int, session: Session) -> Country:
         contry = get_country(country_id, session)
-        session.commit()
         return contry
 
     @staticmethod
