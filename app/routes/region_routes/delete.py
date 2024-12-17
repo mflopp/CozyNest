@@ -25,46 +25,25 @@ def delete_region_handler(id: int) -> Response:
 
     except ValueError as e:
         logging.error(f"Value {ERR_MSG}: {str(e)}", exc_info=TRACEBACK)
-        return create_response(
-            data=[("error", str(e))],
-            code=400
-        )
+        return create_response(data=[("error", str(e))], code=400)
 
     except SQLAlchemyError as e:
-        logging.error(f"Data Base {ERR_MSG}: {e}", exc_info=TRACEBACK)
-        return create_response(
-            data=[("error", str(e))],
-            code=400
-        )
+        logging.error(f"Data Base {ERR_MSG}: {str(e)}", exc_info=TRACEBACK)
+        return create_response(data=[("error", str(e))], code=400)
 
     except NoRecordsFound as e:
-        msg = f"No records found {ERR_MSG} with ID {id}"
-        logging.error(f"{msg}: {str(e)}", exc_info=TRACEBACK)
-        return create_response(
-            data=[("error", msg)],
-            code=404
-        )
+        logging.error(f"NoRecordsFound {ERR_MSG}:{str(e)}", exc_info=TRACEBACK)
+        return create_response(data=[("error", str(e))], code=404)
+
+    except ValidationError as e:
+        logging.error(f"Validation {ERR_MSG}: {str(e)}", exc_info=TRACEBACK)
+        return create_response(data=[("error", str(e))], code=409)
 
     except HasChildError as e:
         msg = f"{ERR_MSG} with ID {id}"
         logging.error(f"{msg}: {str(e)}", exc_info=TRACEBACK)
-        return create_response(
-            data=[("error", msg)],
-            code=409
-        )
-
-    except ValidationError as e:
-        msg = f"Validation {ERR_MSG} with ID {id}"
-        logging.error(f"{msg}: {str(e)}", exc_info=TRACEBACK)
-        return create_response(
-            data=[("error", msg)],
-            code=409
-        )
+        return create_response(data=[("error", msg)], code=409)
 
     except Exception as e:
-        msg = "An unexpected {ERR_MSG}"
-        logging.error(f"{msg}: {str(e)}", exc_info=TRACEBACK)
-        return create_response(
-            data=[("error", msg)],
-            code=500
-        )
+        logging.error(f"Unexpected {ERR_MSG}: {str(e)}", exc_info=TRACEBACK)
+        return create_response(data=[("error", ERR_MSG)], code=500)
