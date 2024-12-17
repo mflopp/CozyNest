@@ -1,12 +1,13 @@
 from sqlalchemy.orm import Session
-from typing import Type, Any, Dict
+from typing import Type, Any, Dict, List
 
 from .methods import (
     add_record,
     save_record,
     update_record,
     delete_record,
-    has_child
+    has_child,
+    parse_record
 )
 
 
@@ -30,3 +31,9 @@ class Recorder:
     @staticmethod
     def has_child(record: Type[Any], child_model: Type[Any]) -> bool:
         return has_child(record, child_model)
+
+    @staticmethod
+    def parse(
+        model_instance: Type[Any], include_fields: List[str] = []
+    ) -> Dict:
+        return parse_record(model_instance, include_fields)
