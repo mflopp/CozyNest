@@ -7,12 +7,13 @@ from models import Region
 from ...country_controller import CountryController
 from utils import Validator, Recorder
 from utils.error_handler import ValidationError, NoRecordsFound
+from .parse_full_region import parse_full_region
 
 ERR_MSG = "Error occurred while Region record creating"
 TRACEBACK = False
 
 
-def create_region(data: Dict, session: Session) -> Region:
+def create_region(data: Dict, session: Session) -> Dict:
     try:
         with session.begin_nested():
             required_fields = ['name', 'country_id']
@@ -45,7 +46,7 @@ def create_region(data: Dict, session: Session) -> Region:
 
             Recorder.add(session, new_region)
 
-            return new_region
+            return parse_full_region(new_region, session)
 
     except NoRecordsFound as e:
         logging.error(
