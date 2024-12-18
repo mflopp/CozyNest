@@ -46,7 +46,7 @@ def create_region(data: Dict, session: Session) -> Dict:
 
             Recorder.add(session, new_region)
 
-            return parse_full_region(new_region, session)
+            return parse_full_region(new_region)
 
     except NoRecordsFound as e:
         logging.error(
