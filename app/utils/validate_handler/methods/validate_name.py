@@ -1,6 +1,7 @@
 import re
-import logging
 from utils import ValidationError
+
+from utils.logs_handler import log_info, log_err
 
 CONDITIONS = [
     {
@@ -33,18 +34,23 @@ CONDITIONS = [
 
 
 def validate_name(name: str) -> None:
-    logging.info('Validation of geografic name started!')
+    log_info('Validation of name started')
     try:
         if not name:
-            raise ValidationError('Name cannot be empty')
+            msg = 'Name cannot be empty'
+            log_err(f'validate_name(): {msg}')
+            raise ValidationError(msg)
 
         error_template = f"Name '{name}' doesn't meet the required format: "
 
         for condition in CONDITIONS:
             if not re.match(condition['pattern'], name):
                 error = condition['error']
+                msg = f'{error_template}{error}'
+                log_err(f'validate_name(): {msg}')
                 raise ValidationError(f'{error_template}{error}')
 
-        logging.info('Validation of geografic name finished!')
+        log_info('Validation of name finished!')
+
     except ValidationError:
         raise
