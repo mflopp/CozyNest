@@ -19,8 +19,10 @@ class RegionController:
         return result
 
     @staticmethod
-    def get_region(region_id: int, session: Session) -> Dict[str, Any]:
-        result = get_region(region_id, session)
+    def get_region(
+        region_id: int, session: Session, return_instance: bool = False
+    ) -> Region | Dict[str, Any]:
+        result = get_region(region_id, session, return_instance)
         return result
 
     @staticmethod
