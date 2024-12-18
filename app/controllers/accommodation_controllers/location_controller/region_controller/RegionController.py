@@ -1,4 +1,4 @@
-from typing import Type, List, Dict, Any
+from typing import List, Dict, Any
 from sqlalchemy.orm import Session
 from models import Region
 from .methods import (
@@ -37,12 +37,11 @@ class RegionController:
         session.commit()
 
     @staticmethod
-    def update(region_id: int, data: Dict, session: Session) -> Region:
-        result = update_region(region_id, data, session)
+    def update(region_id: int, data: Dict, session: Session):
+        update_region(region_id, data, session)
         session.commit()
-        return result
 
     @staticmethod
-    def parse_full(region: Type[Any]) -> Dict[str, Any]:
+    def parse_full(region: Region) -> Dict[str, Any]:
         result = parse_full_region(region)
         return result
