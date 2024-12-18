@@ -1,20 +1,18 @@
-import logging
 from sqlalchemy.orm.exc import UnmappedInstanceError
 from sqlalchemy.inspection import inspect
 from typing import Type, Any
 
+from utils.logs_handler import log_info, log_err
+
 
 def has_child(record: Type[Any], associated_model: Type[Any]) -> bool:
+    log_info(f"checking if {record} has associations in {associated_model}")
     try:
-        logging.info(
-            f"checking if the model {record} has childs in {associated_model}"
-        )
-
-        # Check that the record is associated with the SQLAlchemy mapping
         mapper = inspect(record).mapper
     except UnmappedInstanceError:
-        logging.error("The passed object is not bound to mapping")
-        raise ValueError("The passed object is not bound to mapping.")
+        msg = "The passed object is not bound to mapping"
+        log_err(f'has_child(): {msg}')
+        raise ValueError(msg)
 
     # Finding the relationship between the parent and child model
     for relationship in mapper.relationships.keys():
@@ -22,6 +20,8 @@ def has_child(record: Type[Any], associated_model: Type[Any]) -> bool:
         if related_mapper.mapper.class_ is associated_model:
             # Checking for the presence of child records
             related_items = getattr(record, relationship, None)
+            log_info(f"{record} has associations in {associated_model}")
             return bool(related_items)
 
+    log_info(f"{record} has no associations in {associated_model}")
     return False
