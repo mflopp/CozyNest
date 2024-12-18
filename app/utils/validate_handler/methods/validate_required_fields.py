@@ -1,7 +1,7 @@
-import logging
-
 from typing import List, Dict
+
 from utils.error_handler import ValidationError
+from utils.logs_handler import log_info, log_err
 
 
 def validate_required_field(
@@ -10,19 +10,19 @@ def validate_required_field(
 ) -> None:
     if not bool(data.get(field)):
         err = f"Field '{field}' is required and cannot be empty."
-        logging.error(f'validate_required_field(): {err}')
+        log_err(f'validate_required_field(): {err}')
         raise ValidationError(err)
 
-    logging.info('Required field are given!')
+    log_info(f"Required field '{field}' are given!")
 
 
 def validate_required_fields(
     fields: List[str],
     data: Dict[str, str]
 ) -> None:
-    logging.info('Validation of required fields started.')
+    log_info('Validation of required fields started.')
 
     for field in fields:
         validate_required_field(field, data)
 
-    logging.info('All required fields are given!')
+    log_info('All required fields are given!')
