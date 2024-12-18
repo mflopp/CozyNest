@@ -31,7 +31,7 @@ def fetch_records(
         # if not records:
         #     return []
 
-        log_info('Countries fetching successfully finished')
+        log_info(f"{Model} fetching successfully finished")
         return records
 
     except SQLAlchemyError as e:
