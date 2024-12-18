@@ -54,8 +54,10 @@ class Validator:
         validate_password(password)
 
     @staticmethod
-    def validate_requirements(field: str, is_valid: Callable) -> None:
-        validate_requirements(field, is_valid)
+    def validate_requirements(
+        field: str, is_valid: Callable, requirements: List[str]
+    ) -> None:
+        validate_requirements(field, is_valid, requirements)
 
     @staticmethod
     def validate_required_field(field: str, data: Dict[str, Any]) -> None:
