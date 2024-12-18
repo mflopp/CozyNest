@@ -1,17 +1,15 @@
-from flask import request
 import logging
 from sqlalchemy.exc import SQLAlchemyError
 
-from controllers import GenderController
-from .genders_blueprint import genders_bp
-from utils.error_handler import ValidationError
+from controllers import AmenityCategoryController
+from .amenity_categories_blueprint import amenity_categories_bp
 
 from utils import create_response
 from config import session_scope
 
 
-@genders_bp.route("/getone", methods=['GET'])
-def get_gender_by_name_handler():
+@amenity_categories_bp.route("<int:id>", methods=['GET'])
+def get_amenity_category_by_id_handler(id: int):
     """
     Endpoint for retrieving a user setting by ID. Looks up the user
     in the database and returns the user setting data or a 404 error
@@ -26,41 +24,36 @@ def get_gender_by_name_handler():
     try:
         # Use the session_scope context manager
         with session_scope() as session:
-            gender_data = request.get_json()
-            gender = GenderController.get_one_by_name(
-                gender_data, session
+
+            amenity_category = AmenityCategoryController.get_one_by_id(
+                id, session
             )
 
-            if gender:
+            if amenity_category:
                 return create_response(
                     data=[
-                        ("id", gender.id),
-                        ("gender", gender.gender),
-                        ("description", gender.description)
+                        ("amenity category", amenity_category)
+                        # ("id", amenity_category.id),
+                        # ("categoty", amenity_category.category)
                     ],
                     code=200
                 )
 
-            return {"message": "Gender not found"}, 404
+            return {"message": f"Amenity category with ID {id} not found"}, 404
 
     except SQLAlchemyError as e:
-        logging.error(f"{e}")
+        msg = f"DB error occured while fetching an amenity category: {str(e)}"
+        logging.error(msg, exc_info=True, stack_info=True, stacklevel=2)
         return create_response(
             data=[("error", f"{str(e)}")],
             code=500
         )
 
-    except ValidationError as e:
-        msg = f"Validation error while getting a gender: {str(e)}"
-        logging.error(msg)
-        return create_response(
-            data=[("error", msg)],
-            code=500
-        )
-
     except Exception as e:
-        msg = f"Unexpected error while getting a gender: {e}"
-        logging.error(msg)
+        msg = (
+            f"Unexpected error while getting an amenity category ID {id}: {e}"
+        )
+        logging.error(msg, exc_info=True, stack_info=True, stacklevel=2)
         return create_response(
             data=[("error", msg)],
             code=500

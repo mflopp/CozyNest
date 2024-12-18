@@ -28,7 +28,7 @@ def get_genders_handler():
                     code=200
                 )
 
-            return {"message": "Gender not found"}, 404
+            return {"message": "Genders not found"}, 404
 
     except SQLAlchemyError as e:
         msg = f"DB error occured while fetching genders: {str(e)}"

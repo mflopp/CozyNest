@@ -42,18 +42,17 @@ def get_gender_by_id_handler(id: int):
             return {"message": f"Gender with ID {id} not found"}, 404
 
     except SQLAlchemyError as e:
-        logging.error(f"{e}")
+        msg = f"DB error while getting a gender ID {id}: {e}"
+        logging.error(msg)
         return create_response(
-            data=[("error", f"{str(e)}")],
+            data=[("error", msg)],
             code=500
         )
 
     except Exception as e:
-        logging.error(f"Unexpected error while getting a gender ID {id}: {e}")
+        msg = f"Unexpected error while getting a gender ID {id}: {e}"
+        logging.error(msg)
         return create_response(
-            data=[(
-                "error",
-                f"Unexpected error while getting a gender ID {id}: {e}"
-            )],
+            data=[("error", msg)],
             code=500
         )

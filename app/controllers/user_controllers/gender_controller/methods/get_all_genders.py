@@ -13,8 +13,5 @@ def fetch_genders(session: Session):
 
         return genders
 
-    except SQLAlchemyError:
-        raise
-
-    except Exception:
+    except (SQLAlchemyError, Exception):
         raise
