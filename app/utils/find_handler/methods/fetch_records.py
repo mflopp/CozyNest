@@ -1,7 +1,8 @@
-import logging
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from typing import Optional, Type, List, Any, Dict
+
+from utils.logs_handler import log_info, log_err
 
 
 def fetch_records(
@@ -10,31 +11,29 @@ def fetch_records(
     criteria: Dict[str, Any] = {},
     order_by: Optional[Any] = None
 ) -> List[Any]:
+    log_info('Fetching records started')
     try:
-        logging.info('')
-        model_name = Model.__name__
+        # model_name = Model.__name__
         # Build the query
         query = session.query(Model)
 
         if criteria:
+            log_info('Adding filtering to query')
             query = query.filter(**criteria)
 
         if order_by:
+            log_info('Adding sorting to query')
             query = query.order_by(order_by)
 
         # Execute the query
         records = query.all()
 
-        if not records:
-            logging.info(f"No {model_name} records found.")
-            return []
+        # if not records:
+        #     return []
 
-        logging.info(f"{len(records)} {model_name} records found.")
+        log_info('Countries fetching successfully finished')
         return records
 
-    except SQLAlchemyError as db_err:
-        logging.error(
-            f"Database error while querying {model_name}: {db_err}",
-            exc_info=True
-        )
+    except SQLAlchemyError as e:
+        log_err(f'fetching_records(): DB Error: {e}')
         raise
