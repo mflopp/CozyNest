@@ -29,13 +29,13 @@ def create_country_handler() -> Response:
                 code=200
             )
 
-    except ValidationError as e:
-        log_err(f"Validation {ERR_MSG}: {str(e)}")
-        return create_response(data=[("error", str(e))], code=400)
-
     except ValueError as e:
         log_err(f"Value {ERR_MSG}: {str(e)}")
         return create_response(data=[("error", str(e))], code=400)
+
+    except ValidationError as e:
+        log_err(f"Validation {ERR_MSG}: {str(e)}")
+        return create_response(data=[("error", str(e))], code=409)
 
     except SQLAlchemyError as e:
         log_err(f"Data Base {ERR_MSG}: {str(e)}")
@@ -43,4 +43,4 @@ def create_country_handler() -> Response:
 
     except Exception as e:
         log_err(f"Unexpected {ERR_MSG}: {str(e)}")
-        return create_response(data=[("error", "Creating error")], code=500)
+        return create_response(data=[("error", "Creation error")], code=500)
