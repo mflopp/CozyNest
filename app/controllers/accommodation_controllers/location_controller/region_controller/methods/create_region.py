@@ -1,4 +1,3 @@
-import logging
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from typing import Dict
@@ -8,16 +7,15 @@ from ...country_controller import CountryController
 from utils import Validator, Recorder
 from utils.error_handler import ValidationError, NoRecordsFound
 from .parse_full_region import parse_full_region
-
-ERR_MSG = "Error occurred while Region record creating"
-TRACEBACK = False
+from utils.logs_handler import log_info, log_err
 
 
 def create_region(data: Dict, session: Session) -> Dict:
+    log_info('Region creation started')
     try:
         with session.begin_nested():
-            required_fields = ['name', 'country_id']
-            Validator.validate_required_fields(required_fields, data)
+            fields = ['name', 'country_id']
+            Validator.validate_required_fields(fields, data)
 
             name = data.get('name')
             country_id = data.get('country_id')
@@ -32,49 +30,24 @@ def create_region(data: Dict, session: Session) -> Dict:
 
             country = CountryController.get_country(
                 country_id=data['country_id'],
-                session=session
+                session=session,
+                return_instance=True
             )
-            if not country:
-                raise NoRecordsFound
 
             new_region = Region(
                 country_id=country.id,
                 name=data['name']
             )
             if not new_region:
+                log_err(
+                    "create_region(): Region was not created for some reason"
+                )
                 raise SQLAlchemyError
 
             Recorder.add(session, new_region)
 
+            log_info('Region creation successfully finished')
             return parse_full_region(new_region)
 
-    except NoRecordsFound as e:
-        logging.error(
-            f"No Records Found for creatings: {e}",
-            exc_info=TRACEBACK
-        )
-        raise
-
-    except ValidationError as e:
-        logging.error(
-            f"Validation {ERR_MSG}: {e}", exc_info=TRACEBACK
-        )
-        raise
-
-    except ValueError as e:
-        logging.error(
-            f"Value {ERR_MSG}: {e}", exc_info=TRACEBACK
-        )
-        raise
-
-    except SQLAlchemyError as e:
-        logging.error(
-            f"Data Base {ERR_MSG}: {e}", exc_info=TRACEBACK
-        )
-        raise
-
-    except Exception as e:
-        logging.error(
-            f"Unexpected {ERR_MSG}: {e}", exc_info=TRACEBACK
-        )
+    except (NoRecordsFound, ValidationError, ValueError, Exception):
         raise
