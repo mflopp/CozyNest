@@ -1,20 +1,16 @@
-import logging
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
 from models import Country
-from .get_country import get_country
-
 from utils import Validator, Recorder
 from utils.error_handler import ValidationError, NoRecordsFound
+from utils.logs_handler import log_info
+from .get_country import get_country
 
-ERR_MSG = "Error occurred while updating Country record"
-TRACEBACK = True
 
-
-def update_country(country_id: int, data: dict, session: Session) -> Country:
+def update_country(country_id: int, data: dict, session: Session):
+    log_info('Country updating started')
     try:
-        logging.info(f"Country with ID {country_id} updating started.")
         with session.begin_nested():
             Validator.validate_id(country_id)
 
@@ -31,30 +27,18 @@ def update_country(country_id: int, data: dict, session: Session) -> Country:
 
             Validator.validate_name(new_name)
 
-            # Fetch the existing record
-            country: Country = get_country(country_id, session, True)
-            # Attempt to update the record
+            country = get_country(
+                id=country_id,
+                session=session,
+                return_instance=True
+            )
+
             Recorder.update(session, country, {field: new_name})
 
-        logging.info(f"Country with ID {country_id} successfully updated.")
-        return country
+        log_info(f"Country with ID {country_id} successfully updated.")
 
-    except NoRecordsFound as e:
-        logging.error(f"{ERR_MSG}: {e}", exc_info=TRACEBACK)
-        raise
-
-    except ValidationError as e:
-        logging.error(f"Validation {ERR_MSG}: {e}", exc_info=TRACEBACK)
-        raise
-
-    except ValueError as e:
-        logging.error(f"Value {ERR_MSG}: {e}", exc_info=TRACEBACK)
-        raise
-
-    except SQLAlchemyError as e:
-        logging.error(f"Data Base {ERR_MSG}: {e}", exc_info=TRACEBACK)
-        raise
-
-    except Exception as e:
-        logging.error(f"Unexpected {ERR_MSG}: {e}", exc_info=TRACEBACK)
+    except (
+        NoRecordsFound, ValidationError, ValueError,
+        SQLAlchemyError, Exception
+    ):
         raise
