@@ -8,15 +8,16 @@ from .get_country import get_country
 from utils import Validator, Recorder
 from utils.error_handler import ValidationError, NoRecordsFound
 
+ERR_MSG = "Error occurred while updating Country record"
+TRACEBACK = True
+
 
 def update_country(country_id: int, data: dict, session: Session) -> Country:
     try:
         logging.info(f"Country with ID {country_id} updating started.")
-        # Begin a nested transaction to handle potential rollback
         with session.begin_nested():
             Validator.validate_id(country_id)
 
-            # Validate the input data to ensure it meets the model requirements
             field = 'name'
             Validator.validate_required_field(field, data)
 
@@ -31,7 +32,7 @@ def update_country(country_id: int, data: dict, session: Session) -> Country:
             Validator.validate_name(new_name)
 
             # Fetch the existing record
-            country = get_country(country_id, session)
+            country: Country = get_country(country_id, session, True)
             # Attempt to update the record
             Recorder.update(session, country, {field: new_name})
 
@@ -39,36 +40,21 @@ def update_country(country_id: int, data: dict, session: Session) -> Country:
         return country
 
     except NoRecordsFound as e:
-        logging.error(
-            {f"No records found for updating: {e}"},
-            exc_info=True
-        )
+        logging.error(f"{ERR_MSG}: {e}", exc_info=TRACEBACK)
         raise
 
     except ValidationError as e:
-        logging.error(
-            f"Validation Error occured while updating: {e}",
-            exc_info=True
-        )
+        logging.error(f"Validation {ERR_MSG}: {e}", exc_info=TRACEBACK)
         raise
 
     except ValueError as e:
-        logging.error(
-            f"Value Error occured while updating: {e}",
-            exc_info=True
-        )
+        logging.error(f"Value {ERR_MSG}: {e}", exc_info=TRACEBACK)
         raise
 
     except SQLAlchemyError as e:
-        logging.error(
-            {f"Data Base error occurred while updating: {e}"},
-            exc_info=True
-        )
+        logging.error(f"Data Base {ERR_MSG}: {e}", exc_info=TRACEBACK)
         raise
 
     except Exception as e:
-        logging.error(
-            f"Unexpected error occured while updating: {e}",
-            exc_info=True
-        )
+        logging.error(f"Unexpected {ERR_MSG}: {e}", exc_info=TRACEBACK)
         raise
