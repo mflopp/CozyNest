@@ -29,7 +29,9 @@ def create_country(data: Dict, session: Session) -> Dict[str, Any]:
 
             new_country = Country(name=name)
             if not new_country:
-                log_err("Country was not created for some reason")
+                log_err(
+                    "create_country(): Country was not created for some reason"
+                )
                 raise SQLAlchemyError
 
             Recorder.add(session, new_country)
