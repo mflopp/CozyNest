@@ -9,8 +9,6 @@ from utils.error_handler import ValidationError
 from .parse_full_country import parse_full_country
 from utils.logs_handler import log_info, log_err
 
-ERR_MSG = "Error occurred while Country record creating"
-
 
 def create_country(data: Dict, session: Session) -> Dict[str, Any]:
     log_info('Country creation started')
