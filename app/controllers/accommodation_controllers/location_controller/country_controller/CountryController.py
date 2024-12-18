@@ -1,4 +1,4 @@
-from typing import Type, List, Dict, Any
+from typing import List, Dict, Any
 from sqlalchemy.orm import Session
 from models import Country
 
@@ -37,12 +37,11 @@ class CountryController:
         session.commit()
 
     @staticmethod
-    def update(country_id: int, data: Dict, session: Session) -> Country:
-        result = update_country(country_id, data, session)
+    def update(country_id: int, data: Dict, session: Session):
+        update_country(country_id, data, session)
         session.commit()
-        return result
 
     @staticmethod
-    def parse_full(country: Type[Any]) -> Dict[str, Any]:
+    def parse_full(country: Country) -> Dict[str, Any]:
         result = parse_full_country(country)
         return result
