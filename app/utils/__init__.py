@@ -9,8 +9,9 @@ from .record_handler import Recorder
 from .validate_handler import Validator
 
 from .env_handler import check_env_variable
-from .logs_handler import setup_logger
 from .response_handler import create_response
+
+from .logs_handler import setup_logger, log_info, log_err
 
 
 __all__ = [
@@ -23,7 +24,9 @@ __all__ = [
     'Validator',
 
     'setup_logger',
+    'log_info',
+    'log_err',
+
     'check_env_variable',
     'create_response',
-
 ]
