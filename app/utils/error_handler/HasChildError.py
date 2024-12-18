@@ -1,7 +1,6 @@
 class HasChildError(Exception):
     def __init__(
         self,
-        message="Records has associated records, deletion impossible",
-        code=409
+        message="Record has associated records, deletion impossible"
     ):
-        super().__init__(message, code)
+        super().__init__(message)
