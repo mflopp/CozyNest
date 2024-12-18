@@ -8,6 +8,8 @@ COLORS = {
     'ERROR': "\033[31m",    # Red
     'CRITICAL': "\033[1;31m"    # Bold Red
 }
+ERR_MSG = "Error occurred while Country record creating"
+TRACEBACK = True
 
 
 class MultiColorFormatter(logging.Formatter):
@@ -44,3 +46,11 @@ def setup_logger(log_level: int = logging.INFO) -> None:
 
     # Set logger
     logging.basicConfig(handlers=[console_handler], level=log_level)
+
+
+def log_err(text: str):
+    logging.error(text, exc_info=TRACEBACK)
+
+
+def log_info(text: str):
+    logging.info(text, exc_info=TRACEBACK)
