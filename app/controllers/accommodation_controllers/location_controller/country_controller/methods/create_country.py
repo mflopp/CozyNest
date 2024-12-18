@@ -39,5 +39,5 @@ def create_country(data: Dict, session: Session) -> Dict[str, Any]:
         log_info('Country creation successfully finished')
         return parse_full_country(new_country)
 
-    except (ValidationError, ValueError, Exception):
+    except (ValidationError, ValueError, Exception, SQLAlchemyError):
         raise
