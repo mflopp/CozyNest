@@ -1,13 +1,12 @@
-import logging
 from sqlalchemy.orm import Session
 from typing import Type, Any, Dict
 
+from utils.logs_handler import log_info, log_err
+
 
 def update_record(session: Session, record: Type[Any], new_data: Dict):
+    log_info("Record updating started!")
     try:
-        logging.info("Record updating started!")
-        entity = record.__tablename__
-
         # Attempt to delete the record
         with session.begin_nested():
 
@@ -18,12 +17,8 @@ def update_record(session: Session, record: Type[Any], new_data: Dict):
 
             session.flush()
 
-            message = f"Record with ID = {record.id} successfully updated"
-
-        logging.info(message)
+        log_info("Record successfully updated")
 
     except Exception as e:
-        error_message = f"Failed to update record from {entity}"
-        logging.error(f"{error_message}: {str(e)}")
-
-        raise Exception(f"{error_message}: {str(e)}")
+        log_err(f"Failed to update record: {str(e)}")
+        raise
