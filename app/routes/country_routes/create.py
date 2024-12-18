@@ -3,12 +3,10 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from controllers import CountryController
 from utils.error_handler import ValidationError
-
-from .countries_blueprint import country_bp
 from utils import create_response
 from config import session_scope
-
 from utils.logs_handler import log_err
+from .countries_blueprint import country_bp
 
 ERR_MSG = 'Error occurred while creating Country record'
 
