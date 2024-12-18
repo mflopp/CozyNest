@@ -22,13 +22,10 @@ def validate_uniqueness(
 
         if record:
             msg = f"Duplicate record found with values: {criteria}."
-            logging.warning(msg)
+            logging.error(f"validate_uniqueness(): {msg}", exc_info=True)
             raise ValidationError(msg)
-        else:
-            logging.info(
-                "No duplicate record found with the given combination "
-                f"of values {criteria}"
-            )
+
+        logging.info("Validation of unique values passed")
 
     except ValidationError:
         raise
