@@ -1,4 +1,3 @@
-import logging
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -10,43 +9,30 @@ from utils.error_handler import (
     HasChildError
 )
 
+from utils.logs_handler import log_err, log_info
 from .get_country import get_country
-
-ERR_MSG = "Error occurred while deleting Country record"
-TRACEBACK = True
 
 
 def delete_country(id: int, session: Session):
-    logging.info(f"Country with ID {id} updating started.")
+    log_info(f"Country with ID {id} deletion started.")
     try:
         Validator.validate_id(id)
+
         with session.begin_nested():
             country: Country = get_country(id, session, True)
-            if not country:
-                logging.info('No Country to delete')
-                raise NoRecordsFound
 
             if Recorder.has_child(country, Region):
+                log_err(
+                    f'delete_country(): Deletion forbidden'
+                    f'- {country} has associations in Region'
+                )
                 raise HasChildError
 
             Recorder.delete(session, country)
+            log_info('Country deletion successfully finished')
 
-    except HasChildError as e:
-        logging.error(e, exc_info=TRACEBACK)
-        raise
-
-    except NoRecordsFound as e:
-        logging.error(f"{ERR_MSG}: {e}", exc_info=TRACEBACK)
-        raise
-
-    except ValidationError as e:
-        logging.error(f"Validation {ERR_MSG}: {e}", exc_info=TRACEBACK)
-        raise
-
-    except SQLAlchemyError as e:
-        logging.error(f"Data Base {ERR_MSG}: {e}", exc_info=TRACEBACK)
-        raise
-
-    except Exception as e:
-        logging.error(f"Unexpected {ERR_MSG}: {e}", exc_info=TRACEBACK)
+    except (
+        NoRecordsFound, ValidationError,
+        SQLAlchemyError, ValueError, Exception
+    ):
         raise
