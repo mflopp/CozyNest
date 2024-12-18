@@ -1,15 +1,19 @@
-import logging
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
+from typing import Dict, Any
 
 from models import Country
 from utils import Finder, Validator
 from utils.error_handler import ValidationError, NoRecordsFound
 
-ERR_MSG = "Error occurred while fetching Country record"
+from .parse_full_country import parse_full_country
+from utils.logs_handler import log_info
 
 
-def get_country(id: int, session: Session) -> Country:
+def get_country(
+    id: int, session: Session, return_instance: bool = False
+) -> Country | Dict[str, Any]:
+    log_info('Country fetching started')
     try:
         Validator.validate_id(id)
 
@@ -21,28 +25,16 @@ def get_country(id: int, session: Session) -> Country:
         )
 
         if country:
-            return country
+            log_info('Country fetching successfully finished')
+
+            if return_instance:
+                log_info('Return Country as Model')
+                return country
+
+            log_info('Return Country as Dict')
+            return parse_full_country(country)
 
         raise NoRecordsFound
 
-    except NoRecordsFound as e:
-        logging.error(e, exc_info=True)
-        raise
-
-    except ValidationError as e:
-        logging.error(
-            f"Validation {ERR_MSG}: {e}", exc_info=True
-        )
-        raise
-
-    except SQLAlchemyError as e:
-        logging.error(
-            f"Data Base {ERR_MSG}: {e}", exc_info=True
-        )
-        raise
-
-    except Exception as e:
-        logging.error(
-            f"Unexpected {ERR_MSG}: {e}", exc_info=True
-        )
+    except (NoRecordsFound, ValidationError, SQLAlchemyError, Exception):
         raise
