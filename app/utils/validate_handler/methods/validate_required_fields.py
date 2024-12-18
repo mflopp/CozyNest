@@ -10,6 +10,7 @@ def validate_required_field(
 ) -> None:
     if not bool(data.get(field)):
         err = f"Field '{field}' is required and cannot be empty."
+        logging.error(f'validate_required_field(): {err}')
         raise ValidationError(err)
 
     logging.info('Required field are given!')
