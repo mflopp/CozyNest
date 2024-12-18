@@ -7,7 +7,7 @@ from utils import Finder, Validator
 from utils.error_handler import ValidationError, NoRecordsFound
 
 from .parse_full_country import parse_full_country
-from utils.logs_handler import log_info
+from utils.logs_handler import log_info, log_err
 
 
 def get_country(
@@ -34,6 +34,7 @@ def get_country(
             log_info('Return Country as Dict')
             return parse_full_country(country)
 
+        log_err('get_country(): No Country record found')
         raise NoRecordsFound
 
     except (NoRecordsFound, ValidationError, SQLAlchemyError, Exception):
