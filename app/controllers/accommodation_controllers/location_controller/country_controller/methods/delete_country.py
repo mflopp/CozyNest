@@ -14,7 +14,7 @@ from .get_country import get_country
 
 
 def delete_country(id: int, session: Session):
-    log_info(f"Country with ID {id} deletion started.")
+    log_info(f"Country with ID={id} deletion started.")
     try:
         Validator.validate_id(id)
 
