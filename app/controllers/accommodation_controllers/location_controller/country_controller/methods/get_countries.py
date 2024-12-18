@@ -1,4 +1,3 @@
-import logging
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from typing import List
@@ -6,35 +5,20 @@ from typing import List
 from models import Country
 from utils import Finder
 from utils.error_handler import ValidationError, NoRecordsFound
+from .parse_full_country import parse_full_country
+from utils.logs_handler import log_info
 
-ERR_MSG = "Error occurred while fetching Country records"
-TRACEBACK = True
 
-
-def get_countries(session: Session) -> List[Country]:
+def get_countries(session: Session) -> List:
+    log_info('Countries fetching started')
     try:
         countries = Finder.fetch_records(session, Country)
         Finder.log_found_amount(countries)
-        return countries
 
-    except NoRecordsFound as e:
-        logging.warning(e, exc_info=TRACEBACK)
-        raise
+        result = [parse_full_country(country) for country in countries]
 
-    except ValidationError as e:
-        logging.error(
-            f"Validation {ERR_MSG}: {e}", exc_info=TRACEBACK
-        )
-        raise
+        log_info('Countries fetching successfully finished')
+        return result
 
-    except SQLAlchemyError as e:
-        logging.error(
-            f"Data Base {ERR_MSG}: {e}", exc_info=TRACEBACK
-        )
-        raise
-
-    except Exception as e:
-        logging.error(
-            f"Unexpected {ERR_MSG}: {e}", exc_info=TRACEBACK
-        )
+    except (NoRecordsFound, ValidationError, SQLAlchemyError, Exception):
         raise
