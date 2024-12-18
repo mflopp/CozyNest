@@ -1,4 +1,3 @@
-import logging
 from flask import Response
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -6,10 +5,10 @@ from controllers import RegionController
 from utils.error_handler import NoRecordsFound, ValidationError
 from utils import create_response
 from config import session_scope
+from utils.logs_handler import log_err
 from .regions_blueprint import region_bp
 
 ERR_MSG = "Error occurred while fetching Region records"
-TRACEBACK = True
 
 
 @region_bp.route("", methods=['GET'])
@@ -24,21 +23,21 @@ def get_regions_handler() -> Response:
             )
 
     except ValueError as e:
-        logging.error(f"Value {ERR_MSG}: {str(e)}", exc_info=TRACEBACK)
-        return create_response(data=[("error", str(e))], code=400)
-
-    except SQLAlchemyError as e:
-        logging.error(f"Data Base {ERR_MSG}: {str(e)}", exc_info=TRACEBACK)
+        log_err(f"Value {ERR_MSG}: {str(e)}")
         return create_response(data=[("error", str(e))], code=400)
 
     except NoRecordsFound as e:
-        logging.error(f"NoRecordsFound {ERR_MSG}:{str(e)}", exc_info=TRACEBACK)
+        log_err(f"{ERR_MSG}: {str(e)}")
         return create_response(data=[("error", str(e))], code=404)
 
     except ValidationError as e:
-        logging.error(f"Validation {ERR_MSG}: {str(e)}", exc_info=TRACEBACK)
+        log_err(f'Validation {ERR_MSG}: {str(e)}')
         return create_response(data=[("error", str(e))], code=409)
 
+    except SQLAlchemyError as e:
+        log_err(f"Data Base {ERR_MSG}: {str(e)}")
+        return create_response(data=[("error", str(e))], code=500)
+
     except Exception as e:
-        logging.error(f"Unexpected {ERR_MSG}: {str(e)}", exc_info=TRACEBACK)
-        return create_response(data=[("error", ERR_MSG)], code=500)
+        log_err(f"Unexpected {ERR_MSG}: {str(e)}")
+        return create_response(data=[("error", "Fetching error")], code=500)
