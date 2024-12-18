@@ -27,7 +27,5 @@ def add_record(session: Session, record: Type[Any]):
         message = f"Record successfully created in {entity}: {record.id}"
         log_info(message)
 
-    except SQLAlchemyError as e:
-        error_message = f"Failed to create {record} in {entity}"
-        log_err(f'{error_message}: {str(e)}')
+    except SQLAlchemyError:
         raise
