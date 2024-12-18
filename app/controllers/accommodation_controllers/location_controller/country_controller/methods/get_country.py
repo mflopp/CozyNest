@@ -22,7 +22,7 @@ def get_country(
             criteria={'id': id}
         )
 
-        if country:
+        if country and isinstance(country, Country):
             log_info('Country fetching successfully finished')
 
             if return_instance:
