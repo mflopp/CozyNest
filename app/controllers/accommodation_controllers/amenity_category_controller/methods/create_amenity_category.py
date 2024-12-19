@@ -1,4 +1,3 @@
-import logging
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from typing import Dict, Any
@@ -8,6 +7,7 @@ from utils import Validator, Recorder
 from utils.error_handler import ValidationError
 
 from .parse_full_amenity_category import parse_full_amenity_category
+from utils.logs_handler import log_info, log_err
 
 
 def add_amenity_category(
@@ -25,20 +25,28 @@ def add_amenity_category(
 
             category = user_data.get(field)
 
-            Validator.validate_unique_field(
-                session, AmenitiesCategory,
-                field, category
+            Validator.validate_uniqueness(
+                session=session,
+                Model=AmenitiesCategory,
+                criteria={field: category}
             )
 
-            logging.info(
+            log_info(
                 "Validations succesfully passed! "
                 "(creating an amenity category)"
             )
 
             new_category = AmenitiesCategory(category=category)
+            if not new_category:
+                log_err(
+                    "add_amenity_category(): Amenity category was not created "
+                    "for some reason"
+                )
+                raise SQLAlchemyError
             Recorder.add(session, new_category)
 
         session.flush()
+        log_info('Amenity category creation successfully finished')
         return parse_full_amenity_category(new_category)
 
     except (ValidationError, ValueError, SQLAlchemyError, Exception):
