@@ -2,6 +2,7 @@ from .db_connect import get_session
 
 from contextlib import contextmanager
 
+
 @contextmanager
 def session_scope():
     """
