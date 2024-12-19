@@ -40,8 +40,6 @@ def del_amenity_category(id: int, session: Session):
             # Attempt to delete the record
             Recorder.delete(session, category)
 
-        # commit the transaction after 'with' block
-        session.flush()
         log_info(f"Amenity category ID {id} deletion successfully finished")
 
     except (NoRecordsFound, ValueError, HasChildError,
