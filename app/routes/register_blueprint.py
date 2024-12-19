@@ -7,6 +7,7 @@ from .user_roles_routes import user_roles_bp
 from .user_info_routes import user_info_bp
 from .user_routes import users_bp
 from .amenity_categories_routes import amenity_categories_bp
+from .amenities_routes import amenities_bp
 
 
 def register_all_blueprints(app):
@@ -19,3 +20,4 @@ def register_all_blueprints(app):
     app.register_blueprint(user_info_bp)
     app.register_blueprint(users_bp)
     app.register_blueprint(amenity_categories_bp)
+    app.register_blueprint(amenities_bp)
