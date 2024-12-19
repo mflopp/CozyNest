@@ -1,13 +1,13 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
-from typing import Any
+from typing import Any, Dict
 
 from models import AmenitiesCategory
 from utils import Finder, Validator
-from utils.error_handler import ValidationError
+from utils.error_handler import ValidationError, NoRecordsFound
 
 from .parse_full_amenity_category import parse_full_amenity_category
-from utils.logs_handler import log_info
+from utils.logs_handler import log_info, log_err
 
 
 # def fetch_gender(id: int, session: Session) -> Dict:
@@ -16,7 +16,8 @@ def fetch_amenity_category(
     value: Any,
     session: Session,
     return_instance: bool = False
-) -> AmenitiesCategory:
+) -> AmenitiesCategory | Dict[str, Any]:
+    log_info(f"Amenity category fetching by {field} started...")
     try:
 
         # if field == id create filter for the DB request
@@ -34,7 +35,7 @@ def fetch_amenity_category(
             criteria=filter_criteria
         )
 
-        if category:
+        if category and isinstance(category, AmenitiesCategory):
             log_info('Amenity category fetching successfully finished')
 
             if return_instance:
@@ -44,11 +45,14 @@ def fetch_amenity_category(
             log_info('Return Amenity category as Dict')
             return parse_full_amenity_category(category)
 
-    except SQLAlchemyError as e:
-        raise SQLAlchemyError(
-            {f"DB error occurred while querying amenity category by {field}: "
-             f"{e}"}, 500
-        )
+        log_err('fetch_amenity_category(): No Amenity category record found')
+        raise NoRecordsFound
 
-    except (ValidationError, Exception):
+    # except SQLAlchemyError as e:
+    #     raise SQLAlchemyError(
+    #        {f"DB error occurred while querying amenity category by {field}: "
+    #          f"{e}"}, 500
+    #     )
+
+    except (ValidationError, NoRecordsFound, SQLAlchemyError, Exception):
         raise
