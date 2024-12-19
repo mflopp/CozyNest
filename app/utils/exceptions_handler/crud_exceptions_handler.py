@@ -1,6 +1,7 @@
 from utils.error_handler import (
     NoRecordsFound,
     ValidationError,
+    HasChildError
 )
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -19,6 +20,9 @@ def crud_exceptions_handler(ERR_MSG):
             except NoRecordsFound as e:
                 log_err(f"{ERR_MSG}: {str(e)}")
                 return create_response(data=[("error", str(e))], code=404)
+            except HasChildError as e:
+                log_err(f"{ERR_MSG}: {str(e)}")
+                return create_response(data=[("error", str(e))], code=409)
             except ValidationError as e:
                 log_err(f'Validation {ERR_MSG}: {str(e)}')
                 return create_response(data=[("error", str(e))], code=409)
