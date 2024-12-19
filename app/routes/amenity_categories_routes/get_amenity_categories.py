@@ -14,12 +14,14 @@ ERR_MSG = 'Error occurred while fetching Amenity categories record'
 @amenity_categories_bp.route("", methods=['GET'])
 @crud_exceptions_handler(ERR_MSG)
 def get_amenity_categories_handler() -> Response:
+
     # Use the session_scope context manager
     with session_scope() as session:
+        # fetching amenity categories
         amenity_categories = AmenityCategoryController.get_all(session)
 
-        if amenity_categories:
-            return create_response(
-                data=[("amenity categories", amenity_categories)],
-                code=200
-            )
+        # creating user response
+        return create_response(
+            data=[("amenity categories", amenity_categories)],
+            code=200
+        )
