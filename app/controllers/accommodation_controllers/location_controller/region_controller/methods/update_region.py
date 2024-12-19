@@ -33,7 +33,7 @@ def update_region(region_id: int, data: dict, session: Session):
                 return_instance=True
             )
 
-            Recorder.update(session, region, {field: new_name})
+            Recorder.update(session, region, {field: new_name})  # type: ignore
 
         log_info(f"Region with ID {region_id} successfully updated.")
 
