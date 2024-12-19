@@ -1,54 +1,39 @@
-import logging
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
+from typing import Dict, Any
 
 from models import City
+from utils import Finder, Validator
+from utils.error_handler import ValidationError, NoRecordsFound
+from .parse_full_city import parse_full_city
+from utils.logs_handler import log_info, log_err
 
 
-def get_city(field: str, value: any, session: Session) -> City:
-    """
-    Retrieves a city record from the database by 'id' or 'name'.
-
-    Args:
-        field (str): The name of the field to filter by ('id' or 'name').
-        value (any): The value of the field to filter by.
-        session (Session): The SQLAlchemy session object for DB interaction.
-
-    Returns:
-        City: The retrieved city record.
-
-    Raises:
-        400 Bad Request: If the field or value is invalid.
-        404 Not Found: If no city is found with the given field and value.
-        500 Internal Server Error: For any other errors.
-    """
-    validate_field(field)
-    validate_value(value, field)
-    validate_id(value, field)
-
+def get_city(
+    id: int, session: Session, return_instance: bool = False
+) -> City | Dict[str, Any]:
+    log_info('City fetching started')
     try:
-        # Build filter criteria
-        filter_criteria = set_filter_criteria(field, value)
-        logging.debug(f"Filter criteria created: {filter_criteria}")
+        Validator.validate_id(id)
 
-        # Retrieve the record
-        city = fetch_record(
+        city = Finder.fetch_record(
             session=session,
             Model=City,
-            criteria=filter_criteria,
-            model_name='City'
+            criteria={'id': id}
         )
 
-        return city
+        if city:
+            log_info('City fetching successfully finished')
 
-    except SQLAlchemyError as e:
-        throw_error(
-            500,
-            f"DB error occurred while querying city by {field}: {e}"
-        )
+            if return_instance:
+                log_info('Return City as Model')
+                return city
 
-    except Exception as e:
-        throw_error(
-            500,
-            f"Unexpected error while processing the request: {e}"
-        )
+            log_info('Return City as Dict')
+            return parse_full_city(city)
+
+        log_err('get_city(): No City record found')
+        raise NoRecordsFound
+
+    except (ValidationError, SQLAlchemyError, Exception):
+        raise
