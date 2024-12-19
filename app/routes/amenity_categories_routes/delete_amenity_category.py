@@ -10,7 +10,9 @@ from .amenity_categories_blueprint import amenity_categories_bp
 ERR_MSG = 'Error occurred while deleting Amenity category record'
 
 
-@amenity_categories_bp.route("/<int:id>", methods=['DELETE'])
+@amenity_categories_bp.route(
+    "/<int:id>", methods=['DELETE'], endpoint='delete_amenity_category'
+)
 @crud_exceptions_handler(ERR_MSG)
 def delete_amenity_category_handler(id: int) -> Response:
 
