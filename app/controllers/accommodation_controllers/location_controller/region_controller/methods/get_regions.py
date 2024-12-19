@@ -10,7 +10,7 @@ from utils.logs_handler import log_info
 
 
 def get_regions(session: Session) -> List:
-    log_info('Regionss fetching started')
+    log_info('Regions fetching started')
     try:
         regions = Finder.fetch_records(session, Region)
         Finder.log_found_amount(regions)
