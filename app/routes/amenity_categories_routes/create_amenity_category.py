@@ -10,7 +10,9 @@ from .amenity_categories_blueprint import amenity_categories_bp
 ERR_MSG = 'Error occurred while creating Amenity category record'
 
 
-@amenity_categories_bp.route("", methods=['POST'])
+@amenity_categories_bp.route(
+    "", methods=['POST'], endpoint='create_amenity_category'
+)
 @crud_exceptions_handler(ERR_MSG)
 def create_amenity_category_handler() -> Response:
 
