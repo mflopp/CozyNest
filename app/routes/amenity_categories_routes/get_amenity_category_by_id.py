@@ -13,7 +13,7 @@ ERR_MSG = 'Error occurred while fetching Amenity category record'
 @amenity_categories_bp.route("<int:id>", methods=['GET'])
 @crud_exceptions_handler(ERR_MSG)
 def get_amenity_category_by_id_handler(id: int) -> Response:
-    
+
     # Use the session_scope context manager
     with session_scope() as session:
         # fetching the amenity category by id
