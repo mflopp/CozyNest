@@ -1,60 +1,53 @@
-import logging
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
+from typing import Dict
 
 from models import City
 from ...region_controller import RegionController
-from utils import (
-    Validator,
-    ValidationError,
-    Recorder
-)
+from utils import Validator, Recorder
+from utils.error_handler import ValidationError, NoRecordsFound
+from utils.logs_handler import log_info, log_err
+from .parse_full_city import parse_full_city
 
 
-def create_city(data: dict, session: Session) -> City:
+def create_city(data: dict, session: Session) -> Dict:
+    log_info('City creation started')
     try:
         with session.begin_nested():
-            # Define required and unique fields for validation
-            required_fields = ['name', 'region_id']
+            Validator.validate_required_fields(['name', 'region_id'], data)
 
-            # Validate the input data to ensure it meets the model requirements
-            Validator.validate_required_fields(required_fields, data)
+            name: str = data.get('name')    # type: ignore
+            region_id: int = data.get('region_id')  # type: ignore
 
-            name = data['name']
-            region_id = data['region_id']
-
-            Validator.validate_unique_field(session, City, 'name', name)
             Validator.validate_name(name)
             Validator.validate_id(region_id)
 
-            # Fetch the region data
-            region = RegionController.get_one_by_id(region_id, session)
+            Validator.validate_uniqueness(
+                session=session,
+                Model=City,
+                criteria={
+                    'name': name,
+                    'region_id': region_id
+                }
+            )
 
-            # Create a new City object
-            new_city = City(region.id, name)
+            region = RegionController.get_region(
+                region_id=region_id,
+                session=session,
+                return_instance=True
+            )
 
-            # Attempt to add the record
+            new_city = City(region.id, name)    # type: ignore
+            if not new_city:
+                log_err(
+                    "create_city(): Region was not created for some reason"
+                )
+                raise SQLAlchemyError
+
             Recorder.add(session, new_city)
 
-            return new_city
+            log_info('Region creation successfully finished')
+            return parse_full_city(new_city)
 
-    except ValidationError as e:
-        logging.error(
-            {f"Validation error occurred while creating: {e}"},
-            exc_info=True
-        )
-        raise
-
-    except SQLAlchemyError as e:
-        logging.error(
-            {f"Data Base error occurred while creating: {e}"},
-            exc_info=True
-        )
-        raise
-
-    except Exception as e:
-        logging.error(
-            {f"Unexpected error while creating: {e}"},
-            exc_info=True
-        )
+    except (NoRecordsFound, ValidationError, ValueError, Exception):
         raise
