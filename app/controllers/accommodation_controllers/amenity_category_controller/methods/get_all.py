@@ -12,7 +12,7 @@ from utils.logs_handler import log_info
 def fetch_amenity_categories(session: Session) -> List:
     log_info('Amenity categories fetching started...')
     try:
-        # Fetch all genders records
+        # Fetch all Amenity categories records
         categories = Finder.fetch_records(session, AmenitiesCategory)
         Finder.log_found_amount(categories)
 
