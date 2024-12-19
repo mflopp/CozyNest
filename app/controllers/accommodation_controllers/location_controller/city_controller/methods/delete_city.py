@@ -1,37 +1,42 @@
-import logging
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
+from models import City, Address
+from utils import Recorder, Validator
+from utils.error_handler import (
+    ValidationError,
+    NoRecordsFound,
+    HasChildError
+)
+
+from utils.logs_handler import log_err, log_info
 from .get_city import get_city
-from utils import Recorder, ValidationError
 
 
 def delete_city(id: int, session: Session):
+    log_info(f"City with ID={id} deletion started.")
     try:
+        Validator.validate_id(id)
+
         with session.begin_nested():
-            # Attempt to fetch the region
-            city_to_delete = get_city(field='id', value=id, session=session)
+            city_to_delete: City = get_city(
+                id=id,
+                session=session,
+                return_instance=True
+            )   # type: ignore
 
-            # Attempt to delete the record
+            if Recorder.has_child(city_to_delete, Address):
+                log_err(
+                    f'delete_city(): Deletion forbidden'
+                    f'- {city_to_delete} has associations in Address'
+                )
+                raise HasChildError
+
             Recorder.delete(session, city_to_delete)
+            log_info('City deletion successfully finished')
 
-    except ValidationError as e:
-        logging.error(
-            {f"Validation error occurred while deleting: {e}"},
-            exc_info=True
-        )
-        raise
-
-    except SQLAlchemyError as e:
-        logging.error(
-            {f"Data Base error occurred while deleting: {e}"},
-            exc_info=True
-        )
-        raise
-
-    except Exception as e:
-        logging.error(
-            {f"Unexpected error while deleting: {e}"},
-            exc_info=True
-        )
+    except (
+        NoRecordsFound, ValidationError,
+        SQLAlchemyError, ValueError, Exception
+    ):
         raise
