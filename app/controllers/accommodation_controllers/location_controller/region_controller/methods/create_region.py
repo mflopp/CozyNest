@@ -14,19 +14,22 @@ def create_region(data: Dict, session: Session) -> Dict:
     log_info('Region creation started')
     try:
         with session.begin_nested():
-            fields = ['name', 'country_id']
-            Validator.validate_required_fields(fields, data)
+            Validator.validate_required_fields(['name', 'country_id'], data)
 
-            name = data.get('name')
-            country_id = data.get('country_id')
+            name: str = data.get('name')    # type: ignore
+            country_id: int = data.get('country_id')    # type: ignore
+
+            Validator.validate_name(name)
+            Validator.validate_id(country_id)
 
             Validator.validate_uniqueness(
                 session=session,
                 Model=Region,
-                criteria={'name': name, 'country_id': country_id}
+                criteria={
+                    'name': name,
+                    'country_id': country_id
+                }
             )
-
-            Validator.validate_name(name)
 
             country = CountryController.get_country(
                 country_id=data['country_id'],
@@ -35,7 +38,7 @@ def create_region(data: Dict, session: Session) -> Dict:
             )
 
             new_region = Region(
-                country_id=country.id,
+                country_id=country.id,  # type: ignore
                 name=data['name']
             )
             if not new_region:
