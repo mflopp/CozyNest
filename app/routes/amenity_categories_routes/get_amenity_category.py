@@ -10,7 +10,9 @@ from .amenity_categories_blueprint import amenity_categories_bp
 ERR_MSG = 'Error occurred while fetching Amenity category record'
 
 
-@amenity_categories_bp.route("/getone", methods=['GET'])
+@amenity_categories_bp.route(
+    "/getone", methods=['GET'], endpoint='get_amenity_category'
+)
 @crud_exceptions_handler(ERR_MSG)
 def get_amenity_category_by_name_handler() -> Response:
 
