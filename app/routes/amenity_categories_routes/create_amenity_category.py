@@ -1,75 +1,34 @@
-import logging
-from flask import request
-from sqlalchemy.exc import SQLAlchemyError
-from typing import Dict
-
-from utils.error_handler import ValidationError
+from flask import Response, request
 from controllers import AmenityCategoryController
-from .amenity_categories_blueprint import amenity_categories_bp
 
+from utils.exceptions_handler import crud_exceptions_handler
 from utils import create_response
 from config import session_scope
 
+from .amenity_categories_blueprint import amenity_categories_bp
+
+ERR_MSG = 'Error occurred while creating Amenity category record'
+
 
 @amenity_categories_bp.route("", methods=['POST'])
-def create_amenity_category_handler() -> Dict:
-    """
-    Endpoint for creating a new gender. Receives user
-    data as JSON and returns
-    the result of creating a gender in the database.
+@crud_exceptions_handler(ERR_MSG)
+def create_amenity_category_handler() -> Response:
 
-    Returns:
-        tuple: A tuple with the response and HTTP status code.
-    """
-    try:
-        # Use the session_scope context manager
-        with session_scope() as session:
+    # Use the session_scope context manager
+    with session_scope() as session:
 
-            amenity_category_data = request.get_json()
-            amenity_category = AmenityCategoryController.create(
-                amenity_category_data,
-                session
-            )
-            return create_response(
-                data=[
-                        ("amenity category", amenity_category)
-                        # ("id", amenity_category.id),
-                        # ("categoty", amenity_category.category)
-                ],
-                code=200
-            )
-
-    except ValidationError as e:
-        # Logging validation error
-        msg = f"Validation error while creating an amenity category: {str(e)}"
-        logging.error(msg, exc_info=True, stack_info=True, stacklevel=2)
-
-        # Returning validation error response
-        return create_response(
-            data=[("error", msg)],
-            code=400
+        # requeting body from user request
+        amenity_category_data = request.get_json()
+        # creating a new amenity category
+        amenity_category = AmenityCategoryController.create(
+            amenity_category_data,
+            session
         )
 
-    except ValueError as e:
-        msg = f"Value Error occured while creating an amenity category: {e}"
-        logging.error(msg, exc_info=True, stack_info=True, stacklevel=2)
+        # creating user response
         return create_response(
-            data=[("error", msg)],
-            code=400
-        )
-
-    except SQLAlchemyError as e:
-        msg = f"DB error occurred while creating an amenity category: {e}"
-        logging.error(msg, exc_info=True, stack_info=True, stacklevel=2)
-        return create_response(
-            data=[("error", msg)],
-            code=400
-        )
-
-    except Exception as e:
-        msg = f"Error occurred while creating an amenity category: {str(e)}"
-        logging.error(msg, exc_info=True, stack_info=True, stacklevel=2)
-        return create_response(
-            data=[("error", msg)],
-            code=500
+            data=[
+                    ("amenity category", amenity_category)
+            ],
+            code=200
         )
