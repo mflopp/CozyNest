@@ -1,37 +1,24 @@
-import logging
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
+from typing import List
 
-from models.addresses import Region
+from models import City
+from utils import Finder
+from utils.error_handler import ValidationError, NoRecordsFound
+from .parse_full_city import parse_full_city
+from utils.logs_handler import log_info
 
 
-def get_cities(session: Session) -> list[str]:
-    return
-    # """
-    # Retrieves a list of all cities from the database.
+def get_cities(session: Session) -> List:
+    log_info('Cities fetching started')
+    try:
+        cities = Finder.fetch_records(session, City)
+        Finder.log_found_amount(cities)
 
-    # Args:
-    #     session (Session): SQLAlchemy session object.
+        result = [parse_full_city(city) for city in cities]
 
-    # Returns:
-    #     list[str]: List of region names.
+        log_info('Cities fetching successfully finished')
+        return result
 
-    # Raises:
-    #     404 Not Found: If no cities are found in the database.
-    #     500 Internal Server Error: If database query fails.
-    # """
-    # try:
-    #     # Query all cities
-    #     cities = session.query(Region).all()
-
-    #     # Check if no cities are found
-    #     if not cities:
-    #         throw_error(404, "No Cities found in the database.")
-
-    #     # Log number of cities found
-    #     logging.info(
-    #         f"{len(cities.id)} cities found in the database."
-    #     )
-    #     return cities
-    # except Exception:
-    #     raise
+    except (NoRecordsFound, ValidationError, SQLAlchemyError, Exception):
+        raise
