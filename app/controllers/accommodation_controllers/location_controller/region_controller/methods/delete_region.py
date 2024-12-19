@@ -19,7 +19,11 @@ def delete_region(id: int, session: Session):
         Validator.validate_id(id)
 
         with session.begin_nested():
-            region: Region = get_region(id, session, True)
+            region: Region = get_region(
+                id=id,
+                session=session,
+                return_instance=True
+            )  # type: ignore
 
             if Recorder.has_child(region, City):
                 log_err(
