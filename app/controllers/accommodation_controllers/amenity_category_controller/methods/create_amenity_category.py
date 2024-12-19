@@ -45,7 +45,6 @@ def add_amenity_category(
                 raise SQLAlchemyError
             Recorder.add(session, new_category)
 
-        session.flush()
         log_info('Amenity category creation successfully finished')
         return parse_full_amenity_category(new_category)
 
