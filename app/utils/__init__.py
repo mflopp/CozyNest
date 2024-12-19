@@ -12,6 +12,7 @@ from .env_handler import check_env_variable
 from .response_handler import create_response
 
 from .logs_handler import setup_logger, log_info, log_err
+from .exceptions_handler import crud_exceptions_handler
 
 
 __all__ = [
@@ -29,4 +30,6 @@ __all__ = [
 
     'check_env_variable',
     'create_response',
+
+    'crud_exceptions_handler',
 ]
