@@ -21,7 +21,7 @@ class CityController:
         return city
 
     @staticmethod
-    def get_city(
+    def get(
         city_id: int,
         session: Session,
         return_instance: bool = False
