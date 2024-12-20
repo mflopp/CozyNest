@@ -1,6 +1,8 @@
 import logging
-from .create_funcs import create_gender, create_role, create_setting
-from .create_funcs import create_user, create_user_info
+from .create_funcs import (
+    create_gender, create_role, create_setting,
+    create_user, create_user_info
+)
 
 logging.basicConfig(level=logging.INFO)
 
