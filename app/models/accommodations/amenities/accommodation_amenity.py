@@ -13,7 +13,7 @@ class AccommodationAmenity(Base):
         ForeignKey('accommodations.id'),
         nullable=False
     )
-    amenities_id = Column(
+    amenity_id = Column(
         Integer,
         ForeignKey('amenities.id'),
         nullable=False
@@ -29,4 +29,4 @@ class AccommodationAmenity(Base):
     def __repr__(self) -> str:
         return (f"<AccommodationAmenity(id={self.id}, "
                 f"accommodation_id={self.accommodation_id}, "
-                f"amenities_id={self.amenities_id})>")
+                f"amenities_id={self.amenity_id})>")
