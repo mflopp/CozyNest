@@ -1,5 +1,6 @@
 import logging
 from models.users import UserRole, Gender, UserSettings, UserInfo, User
+from models.addresses import Country
 
 logging.basicConfig(level=logging.INFO)
 
@@ -121,3 +122,11 @@ def create_user(session, role, info, email, password, phone):
     )
     add_record(session, user, 'Users')
     return user
+
+
+def create_country(session, name):
+    country = Country(
+        name=name
+    )
+    add_record(session, country, 'Countries')
+    return country
