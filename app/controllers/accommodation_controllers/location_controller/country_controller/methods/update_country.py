@@ -33,7 +33,9 @@ def update_country(country_id: int, data: dict, session: Session):
                 return_instance=True
             )
 
-            Recorder.update(session, country, {field: new_name})
+            Recorder.update(
+                session, country, {field: new_name}  # type: ignore
+            )
 
         log_info(f"Country with ID {country_id} successfully updated.")
 
