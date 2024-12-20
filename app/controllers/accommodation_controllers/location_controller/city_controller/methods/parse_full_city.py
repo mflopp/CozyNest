@@ -1,10 +1,10 @@
-from typing import Type, Any, Dict
-
+from typing import Dict
+from models import City
 from utils.record_handler import Recorder
 from ...region_controller import RegionController
 
 
-def parse_full_city(city: Type[Any]) -> Dict:
+def parse_full_city(city: City) -> Dict:
     parsed_region = RegionController.parse_full(city.region)
 
     parsed_city = Recorder.parse(

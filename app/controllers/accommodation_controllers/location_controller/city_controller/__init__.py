@@ -1,4 +1,4 @@
-from .city_controller import CityController
+from .CityController import CityController
 
 __all__ = [
     'CityController'

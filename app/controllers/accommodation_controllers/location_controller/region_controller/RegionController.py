@@ -22,14 +22,11 @@ class RegionController:
     def get_region(
         region_id: int, session: Session, return_instance: bool = False
     ) -> Region | Dict[str, Any]:
-        result = get_region(region_id, session, return_instance)
-        return result
+        return get_region(region_id, session, return_instance)
 
     @staticmethod
     def get_all(session: Session) -> List:
-        result = get_regions(session)
-        session.commit()
-        return result
+        return get_regions(session)
 
     @staticmethod
     def delete(region_id: int, session: Session):
@@ -43,5 +40,4 @@ class RegionController:
 
     @staticmethod
     def parse_full(region: Region) -> Dict[str, Any]:
-        result = parse_full_region(region)
-        return result
+        return parse_full_region(region)

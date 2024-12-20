@@ -19,7 +19,7 @@ def delete_country(id: int, session: Session):
         Validator.validate_id(id)
 
         with session.begin_nested():
-            country: Country = get_country(id, session, True)
+            country: Country = get_country(id, session, True)   # type: ignore
 
             if Recorder.has_child(country, Region):
                 log_err(
