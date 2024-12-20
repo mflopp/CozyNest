@@ -31,6 +31,8 @@ def update_amenity(amenity_id: int, data: dict, session: Session):
                 name_new = amenity_current.name
             if not category_id_new:
                 category_id_new = amenity_current.category_id
+            else:
+                Validator.validate_id(category_id_new)
 
             new_data = {'name': name_new, 'category_id': category_id_new}
 
