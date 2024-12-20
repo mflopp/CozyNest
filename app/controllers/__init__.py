@@ -5,7 +5,8 @@ from .user_controllers import (
 
 from .accommodation_controllers import (
     CountryController, RegionController, CityController,
-    AmenityCategoryController, AmenityController
+    AmenityCategoryController, AmenityController,
+    AccommodationAmenityController
 )
 
 
@@ -19,5 +20,6 @@ __all__ = [
     'RegionController',
     'CityController',
     'AmenityCategoryController',
-    'AmenityController'
+    'AmenityController',
+    'AccommodationAmenityController'
 ]
