@@ -24,11 +24,11 @@ def fetch_amenity(
         if field == "id":
             filter_criteria = {field: value}
         else:
-            # else check if 'gender' parameter exists in user request
+            # else check if 'name' parameter exists in user request
             Validator.validate_required_field(field, value)
             filter_criteria = Finder.extract_required_data([field], value)
 
-        # Fetch the gender record
+        # Fetch the amenity record
         amenity = Finder.fetch_record(
             session=session,
             Model=Amenity,
