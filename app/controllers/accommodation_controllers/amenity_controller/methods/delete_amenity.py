@@ -25,10 +25,10 @@ def del_amenity(id: int, session: Session):
                 'id', id, session, True
             )
 
-            # Check if current is in use in user_info
+            # Check if amenity is in use in AccommodationAmenity
             if Recorder.has_child(amenity, AccommodationAmenity):
                 log_err(
-                    f"del_amenity(): Deletion {id} forbidden"
+                    f"del_amenity(): Deletion {id} forbidden "
                     f"- {amenity} has associations in AccommodationAmenity"
                 )
                 raise HasChildError
