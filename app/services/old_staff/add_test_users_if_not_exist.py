@@ -1,10 +1,13 @@
 import logging
 from models.users import UserRole, Gender, UserSettings, UserInfo, User
+from models.addresses import Country
 
 from .create_user_test import session
 
-from .create_funcs import create_gender, create_role, create_setting
-from .create_funcs import create_user, create_user_info
+from .create_funcs import (
+    create_gender, create_role, create_setting,
+    create_user, create_user_info, create_country
+)
 
 
 def get_first_record_by_criteria(
@@ -70,6 +73,14 @@ def create_user_if_not_exists(
         create_user(session, role_obj, info_obj, email, pswd, phone)
 
 
+def create_country_if_not_exists(
+    name: str
+) -> None:
+    """Create a country if it does not already exist."""
+    if not record_exists(Country, {"name": name}):
+        create_country(session, name)
+
+
 def test_users_create_if_not_exist() -> None:
     """Add predefined test users and associated data to the database
     if they do not already exist."""
@@ -112,6 +123,24 @@ def test_users_create_if_not_exist() -> None:
         create_user_if_not_exists(
             "User", "donaldh@ma.il", "qweQWE1!",
             "123-777-5555", "Donald", "Trump"
+        )
+        create_country_if_not_exists(
+            "Israel"
+        )
+        create_country_if_not_exists(
+            "USA"
+        )
+        create_country_if_not_exists(
+            "France"
+        )
+        create_country_if_not_exists(
+            "Norway"
+        )
+        create_country_if_not_exists(
+            "Ukraine"
+        )
+        create_country_if_not_exists(
+            "Russia"
         )
 
         logging.info("Test data added successfully.")
