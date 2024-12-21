@@ -9,6 +9,7 @@ from .user_routes import users_bp
 from .amenity_categories_routes import amenity_categories_bp
 from .amenities_routes import amenities_bp
 from .accommodation_amenities_routes import accommodation_amenities_bp
+from .accommodation_types_routes import accommodation_types_bp
 
 
 def register_all_blueprints(app):
@@ -23,3 +24,4 @@ def register_all_blueprints(app):
     app.register_blueprint(amenity_categories_bp)
     app.register_blueprint(amenities_bp)
     app.register_blueprint(accommodation_amenities_bp)
+    app.register_blueprint(accommodation_types_bp)
