@@ -2,7 +2,7 @@ from typing import Type, Any, Dict
 
 from utils.record_handler import Recorder
 from ...amenity_controller import AmenityController
-# from ...accommodation_controller import AmenityController
+# from ...accommodation_controller import AccommodationController
 
 
 def parse_full_accommodation_amenity(accommodation_amenity: Type[Any]) -> Dict:
