@@ -25,11 +25,7 @@ def del_amenity_category(id: int, session: Session):
                 'id', id, session, True
             )
 
-            # if not category:
-            #     msg = f"Amenity category ID {id} not found"
-            #     raise NoRecordsFound(msg)
-
-            # Check if current category is in use in user_info
+            # Check if current category is in use in Amenity
             if Recorder.has_child(category, Amenity):
                 log_err(
                     f"del_amenity_category(): Deletion {id} forbidden"
