@@ -10,7 +10,6 @@ from .parse_full_amenity_category import parse_full_amenity_category
 from utils.logs_handler import log_info, log_err
 
 
-# def fetch_gender(id: int, session: Session) -> Dict:
 def fetch_amenity_category(
     field: str,
     value: Any,
@@ -24,11 +23,11 @@ def fetch_amenity_category(
         if field == "id":
             filter_criteria = {field: value}
         else:
-            # else check if 'gender' parameter exists in user request
+            # else check if 'category' parameter exists in user request
             Validator.validate_required_field(field, value)
             filter_criteria = Finder.extract_required_data([field], value)
 
-        # Fetch the gender record
+        # Fetch the category record
         category = Finder.fetch_record(
             session=session,
             Model=AmenitiesCategory,
@@ -47,12 +46,6 @@ def fetch_amenity_category(
 
         log_err('fetch_amenity_category(): No Amenity category record found')
         raise NoRecordsFound
-
-    # except SQLAlchemyError as e:
-    #     raise SQLAlchemyError(
-    #        {f"DB error occurred while querying amenity category by {field}: "
-    #          f"{e}"}, 500
-    #     )
 
     except (ValidationError, NoRecordsFound, SQLAlchemyError, Exception):
         raise
